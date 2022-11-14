@@ -1,0 +1,10 @@
+﻿global using Infinite.Base.Contracts;
+global using Infinite.Base.Entities;
+global using Infinite.Base.Enums;
+global using Infinite.Base.Requests;
+global using Infinite.Base.Responses;
+global using Infinite.Base.Wrapper;
+global using Infinite.Core.Extensions;
+global using Infinite.Core.Interfaces.Features;
+global using Infinite.Core.Interfaces.Repositories;
+global using Microsoft.EntityFrameworkCore;

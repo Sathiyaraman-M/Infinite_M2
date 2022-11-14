@@ -1,0 +1,26 @@
+﻿@using System.Security.Claims
+@using IdentityModel
+@inject SignOutSessionStateManager SignOutManager
+
+<AuthorizeView>
+    <Authorized>
+        <a href="Personal/Settings" class="text-white">
+            Hello, @(context.User.FindFirstValue(JwtClaimTypes.PreferredUserName))!
+        </a>
+        <ArcButton OnClick="BeginSignOut" BackgroundColor="Color.Light" Class="ms-2">Log out</ArcButton>
+    </Authorized>
+    <NotAuthorized>
+        <ArcButton OnClick="@(() => NavigationManager.NavigateTo("authentication/login"))" 
+                   BackgroundColor="Color.Light">
+            Log in
+        </ArcButton>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private async Task BeginSignOut()
+    {
+        await SignOutManager.SetSignOutState();
+        NavigationManager.NavigateTo("authentication/logout");
+    }
+}
