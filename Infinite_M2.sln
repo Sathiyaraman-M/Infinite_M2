@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infinite.Core", "Infinite.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infinite.Base", "Infinite.Base\Infinite.Base.csproj", "{1E5F8455-8F67-446B-A4CE-5ED617424FF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infinite.Web", "Infinite.Web\Infinite.Web.csproj", "{35B0BEEC-19E5-4C90-93E7-422EB7978450}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infinite.Client", "Infinite.Client\Infinite.Client.csproj", "{35B0BEEC-19E5-4C90-93E7-422EB7978450}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

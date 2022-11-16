@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Infinite.Web;
+global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Infinite.Base.Wrapper;
+using Infinite.Client.Extensions;
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
-
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
-await builder.Build().RunAsync();
+WebAssemblyHostBuilder.CreateDefault(args)
+    .AddRootComponents()
+    .ConfigureServices()
+    .Build()
+    .InvokeStartupServices()
+    .RunAsync();

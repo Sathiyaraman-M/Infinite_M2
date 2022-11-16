@@ -2,6 +2,6 @@
     protected override void OnInitialized()
     {
         var redirectUrl = $"authentication/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}";
-        NavigationManager.NavigateTo(redirectUrl);
+        NavigationManager.NavigateToLogin(redirectUrl);
     }
 }

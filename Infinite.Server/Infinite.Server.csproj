@@ -6,20 +6,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Infinite.Core\Infinite.Core.csproj" />
-      <ProjectReference Include="..\Infinite.Web\Infinite.Web.csproj" />
+        <ProjectReference Include="..\Infinite.Core\Infinite.Core.csproj" />
+        <ProjectReference Include="..\Infinite.Client\Infinite.Client.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Files" />
+        <Folder Include="Files" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
+        <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 
 </Project>

@@ -19,11 +19,18 @@ public static class HostingExtensions
             options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
         builder.Services.AddIdentity<AppUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<AppDbContext>();
+        builder.Services.AddIdentityServer()
+            .AddApiAuthorization<AppUser, AppDbContext>();
         builder.Services.AddAuthentication()
             .AddGoogle(options =>
             {
                 options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
                 options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+            })
+            .AddGitHub(options =>
+            {
+                options.ClientId = builder.Configuration["Authentication:GitHub:ClientId"]!;
+                options.ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"]!;
             });
         builder.Services.AddAuthorization();
         builder.Services.ConfigureInternalServices();
@@ -53,10 +60,11 @@ public static class HostingExtensions
 
         app.UseHttpsRedirection();
 
-        app.UseBlazorFrameworkFiles();
         app.UseStaticFiles();
+        app.UseBlazorFrameworkFiles();
         app.UseRouting();
 
+        app.UseIdentityServer();
         app.UseAuthentication();
         app.UseAuthorization();
 

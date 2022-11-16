@@ -3,23 +3,32 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Infinite.Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Novel Infinite</title>
     <base href="/" />
-    <link href="css/app.css" rel="stylesheet" />
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="css/app.css" />
+    <link href="_content/Blazored.Typeahead/blazored-typeahead.css" rel="stylesheet" />
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="Infinite.Web.styles.css" rel="stylesheet" /> -->
 </head>
 
-<body>
-    <div id="app">Loading...</div>
+<body class="theme-light">
+    <div id="app">
+        <div class="linear-progress"></div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+    
+    <script src="js/themeManager.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/Blazored.Typeahead/blazored-typeahead.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+    <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
 </body>
 
 </html>

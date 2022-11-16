@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Duende.IdentityServer.EntityFramework.Options;
+using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+using Microsoft.Extensions.Options;
 
 namespace Infinite.Core.Persistence;
 
-public class AppDbContext : IdentityDbContext<AppUser>
+public class AppDbContext : ApiAuthorizationDbContext<AppUser>
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions, IOptions<OperationalStoreOptions> operationalStoreOptions) 
+        : base(dbContextOptions, operationalStoreOptions)
     {
         
     }

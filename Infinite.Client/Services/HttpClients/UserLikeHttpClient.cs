@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Json;
-using Infinite.Shared.Responses;
+using Infinite.Base.Responses;
 
 namespace Infinite.Client.Services.HttpClients;
 
