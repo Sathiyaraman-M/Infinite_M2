@@ -1,3 +1,4 @@
+global using IdentityModel;
 using Infinite.Server;
 
 WebApplication

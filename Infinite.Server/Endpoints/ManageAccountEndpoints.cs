@@ -17,19 +17,19 @@ public static class ManageAccountEndpoints
 
         manageAccount.MapGet("portfolio",async (string authorId, HttpContext context, IManageAccountService manageAccountService) =>
         {
-            var userId = context.User.FindFirstValue("sub");
+            var userId = context.User.FindFirstValue(JwtClaimTypes.Subject);
             return Results.Ok(await manageAccountService.GetPortFolioMd(string.IsNullOrEmpty(authorId) ? userId : authorId));
         });
         
         manageAccount.MapPost("portfolio", async (MarkdownModel model, HttpContext context, IManageAccountService manageAccountService) =>
         {
-            var userId = context.User.FindFirstValue("sub");
+            var userId = context.User.FindFirstValue(JwtClaimTypes.Subject);
             return Results.Ok(await manageAccountService.SavePortFolio(userId, model.Markdown));
         });
 
         manageAccount.MapGet("profileInfo",async (HttpContext context, IManageAccountService manageAccountService) =>
         {
-            var userId = context.User.FindFirstValue("sub");
+            var userId = context.User.FindFirstValue(JwtClaimTypes.Subject);
             return Results.Ok(await manageAccountService.GetUserProfileInfo(userId));
         });
 
@@ -38,7 +38,7 @@ public static class ManageAccountEndpoints
 
         manageAccount.MapDelete("account", async (HttpContext context, IManageAccountService manageAccountService) =>
         {
-            var userId = context.User.FindFirstValue("sub");
+            var userId = context.User.FindFirstValue(JwtClaimTypes.Subject);
             await context.SignOutAsync();
             return Results.Ok(await manageAccountService.DeleteInfiniteAccount(userId));
         });
