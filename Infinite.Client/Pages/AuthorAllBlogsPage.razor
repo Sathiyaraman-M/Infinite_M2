@@ -1,0 +1,52 @@
+﻿@page "/{Id:guid}/Blogs"
+@inject BlogHttpClient BlogHttpClient
+@inject ManageAccountHttpClient ManageAccountHttpClient
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col">
+                    @if (_authorPublicInfo != null)
+                    {
+                        <h1>@_authorPublicInfo.FullName's Blogs</h1>
+                    }
+                </div>
+                <div class="col-auto">
+                    <button class="btn rounded-2" @onclick="@(() => LoadData(_pageNumber))">
+                        <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark" />
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3" />
+            <div class="row row-deck">
+                @foreach (var blog in _blogs)
+                {
+                    <div class="col-sm-12 col-md-6 col-lg-3">
+                        <div class="card">
+                            <div class="card-status-top bg-cyan"></div>
+                            <div class="card-body">
+                                <a href="@($"/Blog/{blog.Id}")" class="card-title">@blog.Title</a>
+                                <h5>@blog.AuthorName</h5>
+                                <p>@blog.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                            </div>
+                            <div class="card-footer">
+                                <div class="btn-list">
+                                    <button class="btn">
+                                        <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark" />
+                                        Bookmark
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
