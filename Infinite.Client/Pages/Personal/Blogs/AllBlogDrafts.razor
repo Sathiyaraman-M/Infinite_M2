@@ -27,8 +27,7 @@
             </div>
             @if (_blogs.Count != 0)
             {
-                <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
-                <div class="row row-deck">
+                <div class="row row-deck mb-3">
                     @foreach (var blog in _blogs)
                     {
                         <div class="col-sm-12 col-md-4 col-lg-3">
@@ -42,7 +41,7 @@
                                 <div class="card-footer">
                                     <div class="btn-list">
                                         <button class="btn" @onclick="@(() => NavigationManager.NavigateTo($"/Personal/Blogs/{blog.Id}"))">
-                                            <BSIcon Icon="@TablerIcons.Pencil" />
+                                            <BSIcon Icon="@TablerIcons.Pencil" Color="Color.Dark" />
                                             Edit
                                         </button>
                                         <button class="btn btn-danger" @onclick="(() => DiscardDraftAsync(blog.Id))">

@@ -39,7 +39,7 @@ public partial class CreateEditBlog
     {
         if (DraftId != Guid.Empty && DraftId != null)
         {
-            var result = await HttpClient.GetFromJsonAsync<Result<FullBlogDraftResponse>>($"api/blog/draft/{DraftId}");
+            var result = await HttpClient.GetFromJsonAsync<Result<FullBlogDraftResponse>>($"api/blogs/draft/{DraftId}");
             if (result!.Succeeded)
             {
                 var response = result.Data;
@@ -55,6 +55,8 @@ public partial class CreateEditBlog
                     Visibility = Visibility.Public,
                     DraftId = response.Id
                 };
+                _markdown = response.MarkdownContent;
+                CalculateSize(_markdown);
             }
             else
             {
@@ -67,7 +69,7 @@ public partial class CreateEditBlog
         }
         else if (BlogId != Guid.Empty && BlogId != null)
         {
-            var result = await HttpClient.GetFromJsonAsync<Result<FullBlogResponse>>($"api/blog/{BlogId}");
+            var result = await HttpClient.GetFromJsonAsync<Result<FullBlogResponse>>($"api/blogs/{BlogId}");
             if (result!.Succeeded)
             {
                 var response = result.Data;
@@ -82,6 +84,8 @@ public partial class CreateEditBlog
                     UserId = response.AuthorId,
                     Visibility = response.Visibility
                 };
+                _markdown = response.MarkdownContent;
+                CalculateSize(_markdown);
             }
             else
             {
