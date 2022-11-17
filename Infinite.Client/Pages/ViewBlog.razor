@@ -1,0 +1,184 @@
+﻿@page "/Blog/{Id:guid}"
+@using Markdig
+@using Infinite.Base.Enums
+@attribute [AllowAnonymous]
+@inject UserBookmarkHttpClient UserBookmarkHttpClient
+@inject UserLikeHttpClient UserLikeHttpClient
+
+@if (Blog is not null)
+{
+    <PageTitle>@Blog.Title - @Blog.AuthorName | Novel Infinite</PageTitle>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col">
+                        <div class="h1">@Blog.Title</div>
+                        <div class="page-pretitle">
+                            @switch (Blog.Visibility)
+                            {
+                                case Visibility.Private:
+                                    <span class="badge bg-dark">Private</span>
+                                    break;
+                                case Visibility.Unlisted:
+                                    <span class="badge bg-green">Unlisted</span>
+                                    break;
+                                case Visibility.Public:
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn @(LikeResponse?.Liked ?? false ? "btn-pink" : "") @(IsAuthenticated ? "": "btn-icon")" @onclick="ToggleLike">
+                                <BSIcon Icon="@TablerIcons.Heart" Color="@(LikeResponse?.Liked ?? false ? Color.Light: Color.Dark)" />
+                                @if (IsAuthenticated)
+                                {
+                                    @LikeResponse?.Count.ToString()
+                                }
+                            </button>
+                            @if (IsBookmarked)
+                            {
+                                <button class="btn btn-icon btn-yellow" @onclick="@(() => ToggleBookmark(false))">
+                                    <BSIcon Icon="@TablerIcons.Bookmark" Class="icon-filled" />
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-icon" @onclick="@(() => ToggleBookmark(true))">
+                                    <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark" />
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="d-flex align-items-center mb-3 mt-2">
+                    <span class="avatar rounded-circle" style="background: url('https://avatar.tobi.sh/')"></span>
+                    <div class="d-flex flex-column ms-2 mt-1">
+                        <a href="@($"/{Blog.AuthorId}")">
+                            <h4 class="text-uppercase">@Blog.AuthorName</h4>
+                        </a>
+                        <h5>@Blog.CreatedDate.ToString("MMMM d, yyyy")</h5>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        @(new MarkupString(Markdown.ToHtml(Blog.MarkdownContent ?? "")))
+                    </div>
+                </div>
+                <br/>
+                <h3>Recent from the author</h3>
+                @if (RecentFromAuthor != null)
+                {
+                    <div class="row row-deck">
+                        @foreach (var blog in RecentFromAuthor)
+                        {
+                            <div class="col-sm-12 col-md-6 col-lg-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="card-title" href="@($"/Blog/{blog.Id}")">@blog.Title</a>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <span class="avatar rounded-circle" style="background: url('https://avatar.tobi.sh/')"></span>
+                                            <div class="d-flex flex-column ms-2 mt-1">
+                                                <a href="@($"/{Blog.AuthorId}")">
+                                                    <h4 class="text-uppercase">@Blog.AuthorName</h4>
+                                                </a>
+                                                <h5>@Blog.CreatedDate.ToString("MMMM d, yyyy")</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="progress progress-sm">
+        <div class="progress-bar progress-bar-indeterminate"></div>
+    </div>
+}
+
+@code {
+    
+    [Parameter]
+    public Guid Id { get; set; }
+    private FullBlogResponse Blog { get; set; }
+    private bool IsBookmarked { get; set; }
+    private LikeResponse LikeResponse { get; set; }
+    private List<MinifiedBlogResponse> RecentFromAuthor { get; set; }
+    private bool IsAuthenticated { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await PublicHttpClient.HttpClient.GetFromJsonAsync<Result<FullBlogResponse>>($"api/blogs/{Id}");
+        if (result!.Succeeded)
+        {
+            Blog = result.Data;
+            var recentResult = await PublicHttpClient.HttpClient.GetFromJsonAsync<Result<List<MinifiedBlogResponse>>>($"api/blogs/recent/{Blog.AuthorId}?exclude={Id}");
+            if (recentResult!.Succeeded)
+            {
+                RecentFromAuthor = recentResult.Data;
+            }
+            IsAuthenticated = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
+            if (IsAuthenticated)
+            {
+                var isBookmarkedResult = await UserBookmarkHttpClient.IsBlogBookmarked(Id);
+                if (isBookmarkedResult.Succeeded)
+                    IsBookmarked = isBookmarkedResult.Data;
+                var blogLikeResult = await UserLikeHttpClient.IsBlogLiked(Id);
+                if (blogLikeResult.Succeeded)
+                    LikeResponse = blogLikeResult.Data;
+            }
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+            NavigationManager.NavigateTo("/Explore");
+        }
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task ToggleBookmark(bool toggled)
+    {
+        if (IsAuthenticated)
+        {
+            var toggleBookmarkResult = await UserBookmarkHttpClient.UseCustomHttpClient(PublicHttpClient.HttpClient).ToggleBlogBookmark(Id);
+            if (toggleBookmarkResult.Succeeded)
+                IsBookmarked = toggleBookmarkResult.Data;
+        }
+        else
+        {
+            Toast.Add("Information", "Please sign-in to like the blog");
+        }
+    }
+
+    private async Task ToggleLike()
+    {
+        if (IsAuthenticated)
+        {
+            var toggleLikeResult = await UserLikeHttpClient.UseCustomHttpClient(PublicHttpClient.HttpClient).ToggleBlogLike(Id);
+            if (toggleLikeResult.Succeeded)
+                LikeResponse = toggleLikeResult.Data;
+        }
+        else
+        {
+            Toast.Add("Information", "Please sign-in to bookmark the blog");
+        }
+    }
+}
