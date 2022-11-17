@@ -1,0 +1,101 @@
+﻿@inject ProjectHttpClient ProjectHttpClient
+<EditForm Model="Authors" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <Dialog>
+        <DialogContent>
+            <div class="row">
+                <div class="col">
+                    <BlazoredTypeahead TItem="ProjectAuthorResponse" TValue="ProjectAuthorResponse" Context="author" 
+                                       @bind-Value="SelectedAuthor" SearchMethod="SearchAuthor">
+                        <SelectedTemplate>
+                            @author.Name
+                        </SelectedTemplate>
+                        <ResultTemplate>
+                            @author.Name
+                        </ResultTemplate>
+                    </BlazoredTypeahead>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-icon" @onclick="Add">
+                        <BSIcon Icon="@TablerIcons.Plus" Color="Color.Dark" />
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive mt-2">
+                <table class="table table-vcenter">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var author in Authors)
+                        {
+                            <tr>
+                                <td>@author.Name</td>
+                                <td>
+                                    <button class="btn" disabled="@(author.Id == _userId)" @onclick="@(() => { Authors.Remove(author); StateHasChanged(); })">
+                                        <BSIcon Icon="@TablerIcons.X" Color="Color.Dark" />
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>                            
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </DialogContent>
+        <DialogActions>
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn" @onclick="ArcDialog.Cancel">Cancel</button>
+        </DialogActions>
+    </Dialog>
+</EditForm>
+
+@code {
+
+    [CascadingParameter]
+    private DialogInstance ArcDialog { get; set; }
+
+    [Parameter]
+    public List<ProjectAuthorResponse> Authors { get; set; } = new();
+
+    private List<ProjectAuthorResponse> _searchList = new();
+
+    private ProjectAuthorResponse SelectedAuthor { get; set; }
+
+    private string _userId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _userId = state.User.FindFirstValue("sub");
+    }
+
+    private async Task<IEnumerable<ProjectAuthorResponse>> SearchAuthor(string searchString)
+    {
+        var authors = await ProjectHttpClient.SearchAuthors(searchString);
+        _searchList = authors?.Data ?? new List<ProjectAuthorResponse>();
+        return _searchList;
+    }
+
+    private void Add()
+    {
+        if (Authors.Contains(SelectedAuthor))
+        {
+            Toast.Add("Message", "Selected Author is already in the list", Severity.Info);
+        }
+        else
+        {
+            Authors.Add(SelectedAuthor);
+            SelectedAuthor = null;
+            StateHasChanged();
+        }
+    }
+
+    private void Submit()
+    {
+        ArcDialog.Close(DialogResult.Ok(Authors));
+    }
+}
