@@ -73,32 +73,49 @@
                     </div>
                 </div>
                 <br/>
-                <h3>Recent from the author</h3>
+                <h3>More from the author</h3>
                 @if (RecentFromAuthor != null)
                 {
-                    <div class="row row-deck">
-                        @foreach (var blog in RecentFromAuthor)
-                        {
-                            <div class="col-sm-12 col-md-6 col-lg-3">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <a class="card-title" href="@($"/Blog/{blog.Id}")">@blog.Title</a>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <span class="avatar rounded-circle" style="background: url('https://avatar.tobi.sh/')"></span>
-                                            <div class="d-flex flex-column ms-2 mt-1">
-                                                <a href="@($"/{Blog.AuthorId}")">
-                                                    <h4 class="text-uppercase">@Blog.AuthorName</h4>
-                                                </a>
-                                                <h5>@Blog.CreatedDate.ToString("MMMM d, yyyy")</h5>
+                    @if (RecentFromAuthor.Count != 0)
+                    {
+                        <div class="row row-deck">
+                            @foreach (var blog in RecentFromAuthor)
+                            {
+                                <div class="col-sm-12 col-md-6 col-lg-3">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <a class="card-title" href="@($"/Blog/{blog.Id}")">@blog.Title</a>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar rounded-circle" style="background: url('https://avatar.tobi.sh/')"></span>
+                                                <div class="d-flex flex-column ms-2 mt-1">
+                                                    <a href="@($"/{Blog.AuthorId}")">
+                                                        <h4 class="text-uppercase">@Blog.AuthorName</h4>
+                                                    </a>
+                                                    <h5>@Blog.CreatedDate.ToString("MMMM d, yyyy")</h5>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card">
+                            <div class="empty">
+                                <p class="empty-title">No other blogs!</p>
+                                <p class="empty-subtitle text-muted">Seems this is the author's only public blog!</p>
+                                <div class="empty-actions">
+                                    <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo($"{Blog.AuthorId}"))">
+                                        Explore the author's page
+                                    </button>
+                                </div>
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
                 }
             </div>
         </div>
