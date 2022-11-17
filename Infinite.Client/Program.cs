@@ -1,6 +1,7 @@
 global using Microsoft.AspNetCore.Components.Web;
 global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 global using Infinite.Base.Wrapper;
+global using BlazorSlice.Toast;
 using Infinite.Client.Extensions;
 
 WebAssemblyHostBuilder.CreateDefault(args)

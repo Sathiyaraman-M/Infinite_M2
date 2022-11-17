@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Infinite.Core.Interfaces.Features;
+﻿using Infinite.Core.Interfaces.Features;
 
 namespace Infinite.Server.Endpoints;
 

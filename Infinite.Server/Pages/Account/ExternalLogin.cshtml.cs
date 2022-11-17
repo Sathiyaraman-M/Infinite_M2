@@ -1,11 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using Infinite.Base.Entities;
 using Infinite.Base.Enums;
 using Infinite.Core.Interfaces.Repositories;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Infinite.Server.Pages.Account;

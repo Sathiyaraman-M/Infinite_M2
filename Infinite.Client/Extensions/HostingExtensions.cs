@@ -1,4 +1,5 @@
-﻿using BlazorSlice.Toast.Extensions;
+﻿using BlazorSlice.Dialog.Extensions;
+using BlazorSlice.Toast.Extensions;
 using Infinite.Client.Services;
 using Infinite.Client.Services.HttpClients;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
@@ -23,6 +24,7 @@ public static class HostingExtensions
         // });
         builder.Services.AddApiAuthorization();
         builder.Services.AddBlazorSliceToast();
+        builder.Services.AddBlazorSliceDialog();
         builder.Services.AddSingleton<NavigationService>();
         return builder;
     }
@@ -32,6 +34,7 @@ public static class HostingExtensions
         services.AddHttpClient("Infinite.ServerAPI", client => client.BaseAddress = new Uri(baseAddress)).AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
         services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Infinite.ServerAPI"));
         services.AddHttpClient<PublicHttpClient>(client => client.BaseAddress = new Uri(baseAddress));
+        services.AddTransient<BlogHttpClient>();
         services.AddTransient<UserBookmarkHttpClient>();
         services.AddTransient<UserLikeHttpClient>();
     }

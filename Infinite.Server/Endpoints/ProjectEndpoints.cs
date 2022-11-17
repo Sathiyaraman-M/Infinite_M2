@@ -1,7 +1,5 @@
-﻿using System.Security.Claims;
-using Infinite.Base.Requests;
+﻿using Infinite.Base.Requests;
 using Infinite.Core.Interfaces.Features;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Infinite.Server.Endpoints;
 

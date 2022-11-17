@@ -1,6 +1,5 @@
 using Infinite.Base.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Infinite.Server.Pages.Account;

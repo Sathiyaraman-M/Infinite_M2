@@ -1,0 +1,125 @@
+﻿@page "/Personal/Blogs/Liked"
+@inject UserLikeHttpClient UserLikeHttpClient
+
+<PageTitle>Your Liked Blogs | Novel Infinite</PageTitle>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-xl">
+            <div class="row g-2">
+                <div class="col">
+                    <div class="page-title">Your Liked Blogs</div>
+                    <div class="page-pretitle">Find all your liked blogs here</div>
+                </div>
+                <div class="col-auto">
+                    <button class="btn" @onclick="@(() => LoadData(_pageNumber))">
+                        <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark" />
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            @if (_blogs.Count > 0)
+            {
+                <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
+                <div class="row row-deck">
+                    @foreach (var blog in _blogs)
+                    {
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <div class="card">
+                                <div class="card-status-top bg-cyan"></div>
+                                <div class="card-body">
+                                    <a href="@($"/Blog/{blog.Id}")" class="card-title">@blog.Title</a>
+                                    <h5>@blog.AuthorName</h5>
+                                    <p>@blog.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="btn-list">
+                                        <button class="btn" @onclick="(() => RemoveFromLiked(blog.Id))">
+                                            <BSIcon Icon="@TablerIcons.Heart_off" Color="Color.Dark"></BSIcon>
+                                            Unlike
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="empty">
+                        <p class="empty-title">No Liked Blogs!</p>
+                        <p class="empty-subtitle text-muted">Liked Blogs is a great way to store your favorite blogs publicly!</p>
+                        <div class="empty-action">
+                            <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("Explore"))">
+                                <BSIcon Icon="@TablerIcons.Plus" />
+                                Explore blogs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private int _pageNumber;
+    private int _pageSize;
+    private int _totalPages;
+    private List<MinifiedBlogResponse> _blogs = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _pageNumber = 1;
+        _pageSize = 12;
+        await base.OnInitializedAsync();
+        await LoadData(_pageNumber);
+    }
+
+    private async Task LoadData(int pageNumber)
+    {
+        var result = await UserLikeHttpClient.GetLikedBlogs(pageNumber, _pageSize);
+        if (result!.Succeeded)
+        {
+            _blogs = result.Data;
+            _pageNumber = result.CurrentPage;
+            _pageSize = result.PageSize;
+            _totalPages = result.TotalPages;
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+
+    private async Task RemoveFromLiked(string blogId)
+    {
+        if (await DialogService.ShowMessageBox("Confirm Unlike", "Are you sure want to remove the blog from Liked Blogs?",
+             "Yes", "No", options: new DialogOptions { Position = DialogPosition.Centered }) == true)
+        {
+            var result = await UserLikeHttpClient.ToggleBlogLike(Guid.Parse(blogId));
+            if (result.Succeeded)
+            {
+                await LoadData(_pageNumber);
+                Toast.Add("Success", "Removed from Liked successfully", Severity.Info);
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    Toast.Add("Error", message, Severity.Error);
+                }
+            }
+        }
+    }
+}

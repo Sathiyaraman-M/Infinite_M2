@@ -1,0 +1,77 @@
+﻿@page "/Personal/Blogs/Drafts"
+@inject BlogHttpClient BlogHttpClient
+<PageTitle>Your Blog Drafts | Novel Infinite</PageTitle>
+<div class="page-wrapper">
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <div class="page-title">Your Blogs Blogs</div>
+                    <div class="page-pretitle">Find all your blog drafts here</div>
+                </div>
+                <div class="col-auto ms-auto d-print-none">
+                    <div class="btn-list">
+                        <button class="btn d-none d-sm-inline-block" @onclick="@(() => LoadData(_pageNumber))">
+                            <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark" />
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="card mb-3">
+                <InputText Value="@_searchString" ValueChanged="Search" ValueExpression="@(() => _searchString)" class="form-control" placeholder="Search blog drafts" />
+            </div>
+            @if (_blogs.Count != 0)
+            {
+                <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
+                <div class="row row-deck">
+                    @foreach (var blog in _blogs)
+                    {
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <div class="card">
+                                <div class="card-status-top bg-cyan"></div>
+                                <div class="card-body">
+                                    <a href="@($"/Blog/{blog.Id}")" class="card-title">@blog.Title</a>
+                                    <h5>@blog.AuthorName</h5>
+                                    <p>@blog.SaveDateTime.ToString("MMMM dd, yyyy")</p>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="btn-list">
+                                        <button class="btn" @onclick="@(() => NavigationManager.NavigateTo($"/Personal/Blogs/{blog.Id}"))">
+                                            <BSIcon Icon="@TablerIcons.Pencil" />
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="(() => DiscardDraftAsync(blog.Id))">
+                                            <BSIcon Icon="@TablerIcons.Trash" />
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="empty">
+                        <p class="empty-title">No Blog Drafts!</p>
+                        <p class="empty-subtitle text-muted">Having an idea? Add it inside a draft!</p>
+                        <div class="empty-action">
+                            <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs/New"))">
+                                <BSIcon Icon="@TablerIcons.Plus" />
+                                Click to add one
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

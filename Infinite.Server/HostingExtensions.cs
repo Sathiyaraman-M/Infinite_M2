@@ -100,11 +100,11 @@ public static class HostingExtensions
 
     public static WebApplication RegisterEndpoints(this WebApplication app)
     {
-        app.RegisterBlogEndpoints();
-        app.RegisterManageAccountEndpoints();
-        app.RegisterProjectEndpoints();
-        app.RegisterUserLikesEndpoints();
-        app.RegisterUserBookmarksEndpoints();
+        //app.RegisterBlogEndpoints();
+        //app.RegisterManageAccountEndpoints();
+        //app.RegisterProjectEndpoints();
+        //app.RegisterUserLikesEndpoints();
+        //app.RegisterUserBookmarksEndpoints();
         return app;
     }
 }

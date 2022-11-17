@@ -1,22 +1,34 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using System.Security.Claims
+@using BlazorSlice.Dialog
+@using BlazorSlice.Dialog.Interfaces
+@using BlazorSlice.Dialog.Services
 @using BlazorSlice.Toast
+@using BlazorSlice.Toast.Internal
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.AspNetCore.Components.WebAssembly.Http
 @using Microsoft.JSInterop
+@using Infinite.Base.Requests
+@using Infinite.Base.Responses
 @using Infinite.Client
+@using Infinite.Client.Extensions
 @using Infinite.Client.Services
 @using Infinite.Client.Services.HttpClients
 @using Infinite.Client.Shared
 @using Infinite.Client.Shared.Components
+@using Infinite.Client.Shared.Components.Controls
 @using Infinite.Client.Shared.Layouts
+@using TablerIcons = BlazorSlice.Toast.TablerIcons
 
 @attribute [Authorize]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDialogService DialogService
 @inject HttpClient HttpClient
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager

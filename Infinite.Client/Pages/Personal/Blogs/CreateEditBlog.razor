@@ -1,0 +1,62 @@
+﻿@page "/Personal/Blogs/New"
+@page "/Personal/Blogs/{BlogId:guid}"
+@page "/Personal/Drafts/{DraftId:guid}"
+@using Infinite.Base.Enums
+@inject BlogHttpClient BlogHttpClient
+<PageTitle>Blog Editor | Novel Infinite</PageTitle>
+
+<div class="page-wrapper">
+    <EditForm Model="Model" OnValidSubmit="SubmitAsync">
+        <div class="page-header">
+            <div class="container-xl">
+                <div class="row g-2">
+                    <div class="col">
+                        <div class="page-title">Blog Editor</div>
+                        <div class="page-pretitle">Create new blog or edit an existing blog</div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn" type="button" @onclick="@NavigationService.NavigateBack">Cancel</button>
+                            <button class="btn btn-primary" type="button" @onclick="SaveToDraftsAsync">Save to Drafts</button>
+                            <button class="btn btn-success" type="submit">Publish</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-9 mb-3">
+                                <label class="form-label">Title</label>
+                                <InputText class="form-control" @bind-Value="Model.Title"/>
+                            </div>
+                            <div class="col-sm-12 col-md-3 mb-3">
+                                <label class="form-label">Visibility</label>
+                                <InputSelect @bind-Value="@Model.Visibility" class="form-select form-control-sm">
+                                    <option value="@Visibility.Public">Public</option>
+                                    <option value="@Visibility.Private">Private</option>
+                                    <option value="@Visibility.Unlisted">Unlisted</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Content(In Markdown)</label>
+                                <textarea rows="@Rows" @bind="@Markdown" @bind:event="oninput" class="form-control"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Preview</label>
+                                <div class="card">
+                                    <div class="card-body">
+                                        @(new MarkupString(Markdig.Markdown.ToHtml(Markdown ?? "")))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+</div>
