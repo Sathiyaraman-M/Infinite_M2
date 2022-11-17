@@ -35,6 +35,7 @@ public static class HostingExtensions
         services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Infinite.ServerAPI"));
         services.AddHttpClient<PublicHttpClient>(client => client.BaseAddress = new Uri(baseAddress));
         services.AddTransient<BlogHttpClient>();
+        services.AddTransient<ManageAccountHttpClient>();
         services.AddTransient<UserBookmarkHttpClient>();
         services.AddTransient<UserLikeHttpClient>();
     }

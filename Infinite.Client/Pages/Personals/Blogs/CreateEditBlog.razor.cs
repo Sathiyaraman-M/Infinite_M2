@@ -2,7 +2,6 @@
 using Infinite.Base.Enums;
 using Infinite.Base.Requests;
 using Infinite.Base.Responses;
-using Microsoft.AspNetCore.Components;
 
 namespace Infinite.Client.Pages.Personals.Blogs;
 
@@ -39,7 +38,7 @@ public partial class CreateEditBlog
     {
         if (DraftId != Guid.Empty && DraftId != null)
         {
-            var result = await HttpClient.GetFromJsonAsync<Result<FullBlogDraftResponse>>($"api/blogs/draft/{DraftId}");
+            var result = await BlogHttpClient.GetFullBlogDraft(DraftId.ToString());
             if (result!.Succeeded)
             {
                 var response = result.Data;
@@ -69,7 +68,7 @@ public partial class CreateEditBlog
         }
         else if (BlogId != Guid.Empty && BlogId != null)
         {
-            var result = await HttpClient.GetFromJsonAsync<Result<FullBlogResponse>>($"api/blogs/{BlogId}");
+            var result = await BlogHttpClient.GetFullBlog(BlogId.ToString());
             if (result!.Succeeded)
             {
                 var response = result.Data;

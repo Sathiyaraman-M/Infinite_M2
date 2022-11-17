@@ -16,28 +16,28 @@ public class BlogHttpClient
 
     public async Task<IResult<FullBlogResponse>> GetFullBlog(string id)
     {
-        return await _httpClient.GetFromJsonAsync<IResult<FullBlogResponse>>("api/blogs/{id}");
+        return await _httpClient.GetFromJsonAsync<Result<FullBlogResponse>>($"api/blogs/{id}");
     }
 
     public async Task<IResult<FullBlogDraftResponse>> GetFullBlogDraft(string id)
     {
-        return await _httpClient.GetFromJsonAsync<IResult<FullBlogDraftResponse>>("api/blogs/draft/{id}");
+        return await _httpClient.GetFromJsonAsync<Result<FullBlogDraftResponse>>($"api/blogs/draft/{id}");
     }
 
     public async Task<IResult<List<MinifiedBlogResponse>>> GetRecentNBlogs(string authorId = null, string exclude = null,
         int n = 4)
     {
         return string.IsNullOrEmpty(authorId)
-            ? await _httpClient.GetFromJsonAsync<IResult<List<MinifiedBlogResponse>>>(
+            ? await _httpClient.GetFromJsonAsync<Result<List<MinifiedBlogResponse>>>(
                 $"api/blogs/recent?exclude={exclude}&n={n}")
-            : await _httpClient.GetFromJsonAsync<IResult<List<MinifiedBlogResponse>>>(
+            : await _httpClient.GetFromJsonAsync<Result<List<MinifiedBlogResponse>>>(
                 $"api/blogs/recent/{authorId}?exclude={exclude}&n={n}");
     }
 
     public async Task<IResult<List<MinifiedBlogDraftResponse>>> GetRecentNBlogDrafts(int n= 4)
     {
-        return await _httpClient.GetFromJsonAsync<IResult<List<MinifiedBlogDraftResponse>>>(
-            "api/blogs/recent/drafts?n={4}");
+        return await _httpClient.GetFromJsonAsync<Result<List<MinifiedBlogDraftResponse>>>(
+            $"api/blogs/recent/drafts?n={n}");
     }
 
     public async Task<PaginatedResult<MinifiedBlogResponse>> GetAllBlogs(int pageNumber, int pageSize,
