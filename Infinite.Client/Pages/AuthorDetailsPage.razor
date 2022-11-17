@@ -1,0 +1,126 @@
+﻿@page "/{Id:guid}"
+@inject BlogHttpClient BlogHttpClient
+@inject ManageAccountHttpClient ManageAccountHttpClient
+
+@if (_isMdLoaded && _authorPublicInfo != null && _isBlogsLoaded)
+{
+    <PageTitle>@_authorPublicInfo.Name | Novel Infinite</PageTitle>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <span class="avatar rounded-circle" style="background: url('https://avatar.tobi.sh/')"></span>
+                            <h1 class="text-uppercase mt-2 ms-2">@_authorPublicInfo.Name</h1>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn" @onclick="@InvokeShareDialog">
+                            <BSIcon Icon="@TablerIcons.Share" Color="Color.Dark" />
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        @if (string.IsNullOrEmpty(_userPortFolioMd))
+                        {
+                            <div class="w-100 d-flex justify-center">
+                                <div class="w-100 d-flex flex-column align-items-center">
+                                    <h3>Empty Portfolio!</h3>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            @(new MarkupString(Markdown.ToHtml(_userPortFolioMd, Pipeline)))
+                        }
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col">
+                        <h2>Projects</h2>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn rounded-2" @onclick="@(() => NavigationManager.NavigateTo($"/{Id}/Projects"))">
+                            <BSIcon Icon="@TablerIcons.List_details" Color="Color.Dark"/>
+                            View All
+                        </button>
+                    </div>
+                </div>
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="w-100 d-flex justify-center">
+                            <div class="w-100 d-flex flex-column align-items-center">
+                                <h3>No Projects!</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col">
+                        <h2>Blogs</h2>
+                    </div>
+                    @if (_latest4Blogs.Count != 0)
+                    {
+                        <div class="col-auto">
+                            <button class="btn rounded-2" @onclick="@(() => NavigationManager.NavigateTo($"/{Id}/Blogs"))">
+                                <BSIcon Icon="@TablerIcons.List_details" Color="Color.Dark" />
+                                View All
+                            </button>
+                        </div>
+                    }
+                </div>
+                @if (_latest4Blogs.Count == 0)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="w-100 d-flex justify-center">
+                                <div class="w-100 d-flex flex-column align-items-center">
+                                    <h3>No Blogs!</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row row-deck">
+                        @foreach (var blog in _latest4Blogs)
+                        {
+                            <div class="col-sm-12 col-md-6 col-lg-3">
+                                <div class="card">
+                                    <div class="card-status-top bg-cyan"></div>
+                                    <div class="card-body">
+                                        <a class="card-title" href="@($"/Blog/{blog.Id}")">@blog.Title</a>
+                                        <h5>@blog.AuthorName</h5>
+                                        <p>@blog.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="btn-list">
+                                            <button class="btn">
+                                                <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark" />
+                                                Bookmark
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="progress progress-sm">
+        <div class="progress-bar progress-bar-indeterminate"></div>
+    </div>
+}
