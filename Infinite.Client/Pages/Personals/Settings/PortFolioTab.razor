@@ -1,0 +1,64 @@
+﻿@inject ManageAccountHttpClient ManageAccountHttpClient
+@if (_isLoaded)
+{
+    <div class="pa-2">
+        @if (string.IsNullOrEmpty(_userPortFolioMd))
+        {
+            <div class="w-100 d-flex justify-center">
+                <div class="w-100 d-flex flex-column align-items-center">
+                    <h3>Looks like you haven't created a portfolio yet!</h3>
+                    <div class="d-flex justify-center">
+                        <button class="btn btn-cyan mt-1" @onclick="@(() => NavigationManager.NavigateTo("/Personal/Portfolio"))">
+                            <BSIcon Icon="@TablerIcons.Plus" />
+                            Create One
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex py-2 flex-row-reverse">
+                <button class="btn" @onclick="@(() => NavigationManager.NavigateTo("Personal/Portfolio"))">
+                    <BSIcon Icon="@TablerIcons.Pencil" Color="Color.Dark" />
+                    Edit
+                </button>
+            </div>
+            @(new MarkupString(Markdown.ToHtml(_userPortFolioMd, Pipeline)))
+        }
+    </div>
+}
+else
+{
+    <div class="progress progress-sm">
+        <div class="progress-bar progress-bar-indeterminate"></div>
+    </div>
+}
+
+
+@code {
+
+    private string _userPortFolioMd;
+    private bool _isLoaded;
+
+    private MarkdownPipeline Pipeline => new MarkdownPipelineBuilder().UseAdvancedExtensions().UseEmojiAndSmiley().Build();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ManageAccountHttpClient.GetUserPortfolio();
+        if (result!.Succeeded)
+        {
+            _userPortFolioMd = result.Data;
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+        await base.OnInitializedAsync();
+        _isLoaded = true;
+    }
+
+}

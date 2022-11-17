@@ -1,0 +1,103 @@
+﻿@using Infinite.Base.Requests
+@using Infinite.Base.Responses
+@using Infinite.Client.Extensions
+@inject ManageAccountHttpClient ManageAccountHttpClient
+<h2>Your Personal Info </h2>
+@if (_loaded)
+{
+    <EditForm Model="Model" OnValidSubmit="SubmitAsync">
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <InputText class="form-control" @bind-Value="@Model.Email" disabled/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <InputText class="form-control" @bind-Value="@Model.Name"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <InputText class="form-control" @bind-Value="@Model.FullName"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mobile</label>
+            <InputText class="form-control" @bind-Value="@Model.Mobile"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">City</label>
+            <InputText class="form-control" @bind-Value="@Model.City"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Country</label>
+            <InputText class="form-control" @bind-Value="@Model.Country"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">About Me</label>
+            <InputText class="form-control" @bind-Value="@Model.AboutMe"/>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Status</label>
+            <InputText class="form-control" @bind-Value="@Model.Status"/>
+        </div>
+        <div class="d-flex flex-row-reverse">
+            <button class="btn bnt-primary" type="submit">Save Details</button>
+        </div>
+    </EditForm>
+}
+else
+{
+    <div class="progress progress-sm">
+        <div class="progress-bar progress-bar-indeterminate"></div>
+    </div>
+}
+
+@code
+{
+    private UpdateUserProfileInfoRequest Model { get; set; } = new();
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ManageAccountHttpClient.GetUserProfileInfo();
+        if (result!.Succeeded)
+        {
+            var response = result.Data;
+            Model = new UpdateUserProfileInfoRequest()
+            {
+                Email = response.Email,
+                AboutMe = response.AboutMe,
+                City = response.City,
+                Country = response.City,
+                DateOfBirth = response.DateOfBirth,
+                FullName = response.FullName,
+                Name = response.Name,
+                Status = response.Status
+            };
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+        await base.OnInitializedAsync();
+        _loaded = true;
+    }
+
+    private async Task SubmitAsync()
+    {
+        var result = await ManageAccountHttpClient.SaveUserProfileInfo(Model);
+        if (result.Succeeded)
+        {
+            Toast.Add("Success", "Updated Profile Info successfully!", Severity.Success);
+            NavigationManager.NavigateTo("/Personal");
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+}

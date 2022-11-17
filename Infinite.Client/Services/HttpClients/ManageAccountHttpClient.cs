@@ -19,7 +19,7 @@ public class ManageAccountHttpClient
         return await _httpClient.GetFromJsonAsync<Result<AuthorPublicInfoResponse>>($"api/manage/details?id={id}");
     }
 
-    public async Task<IResult<string>> GetUserPortfolio(string id)
+    public async Task<IResult<string>> GetUserPortfolio(string id = null)
     {
         return await _httpClient.GetFromJsonAsync<Result<string>>($"api/manage/portfolio?id={id}");
     }

@@ -68,13 +68,13 @@ public class BlogHttpClient
 
     public async Task<IResult> DeleteBlog(string id)
     {
-        var response = await _httpClient.DeleteAsync($"api/blog/{id}");
+        var response = await _httpClient.DeleteAsync($"api/blogs/{id}");
         return await response.ToResult();
     }
 
     public async Task<IResult> DiscardBlogDraft(string id)
     {
-        var response = await _httpClient.DeleteAsync($"api/blog/draft/{id}");
+        var response = await _httpClient.DeleteAsync($"api/blogs/draft/{id}");
         return await response.ToResult();
     }
 }

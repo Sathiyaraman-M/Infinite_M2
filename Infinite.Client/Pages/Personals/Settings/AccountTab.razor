@@ -1,0 +1,24 @@
+﻿@inject ManageAccountHttpClient ManageAccountHttpClient
+<h2>Delete your account permanently</h2>
+<p>Doing so, you wil permanently lose access to your account and also removes all your personal info, projects and blogs from Infinite.</p>
+<button class="btn btn-danger" @onclick="DeleteInfiniteAccount">Delete Account</button>
+
+@code
+{
+    private async Task DeleteInfiniteAccount()
+    {
+        var result = await ManageAccountHttpClient.DeleteAccountPermanently();
+        if (result.Succeeded)
+        {
+            Toast.Add("Permanent Account Deletion Success", "Your account is now permanently deleted from Infinite's Database", Severity.Success);
+            NavigationManager.NavigateToLogout("authentication/logout");
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+}

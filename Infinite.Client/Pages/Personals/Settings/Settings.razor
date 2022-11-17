@@ -1,0 +1,41 @@
+﻿@page "/Personal/Settings"
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-xl">
+            <div class="page-title">Settings</div>
+            <div class="page-pretitle">Manage your account settings</div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="card">
+                <div class="card-header">
+                    <div class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
+                        <li class="nav-item">
+                            <a href="#account-tab" class="nav-link active" data-bs-toggle="tab">Account</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#portfolio-tab" class="nav-link" data-bs-toggle="tab">Portfolio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#personalInfo-tab" class="nav-link" data-bs-toggle="tab">Personal Info</a>
+                        </li>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane active show" id="account-tab">
+                            <AccountTab />
+                        </div>
+                        <div class="tab-pane" id="portfolio-tab">
+                            <PortFolioTab />
+                        </div>
+                        <div class="tab-pane" id="personalInfo-tab">
+                            <PersonalInfoTab />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

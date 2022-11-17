@@ -24,7 +24,7 @@ public class ManageController : ControllerBase
     }
     
     [HttpGet("portfolio")]
-    public async Task<IActionResult> GetUserPortFolio(string authorId)
+    public async Task<IActionResult> GetUserPortFolio(string authorId = null)
     {
         var userId = HttpContext.User.FindFirstValue(JwtClaimTypes.Subject);
         var result = await _manageAccountService.GetPortFolioMd(string.IsNullOrEmpty(authorId) ? userId : authorId);
