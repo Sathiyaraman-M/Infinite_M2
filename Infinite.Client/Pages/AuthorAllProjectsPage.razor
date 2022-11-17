@@ -1,7 +1,7 @@
-﻿@page "/{Id:guid}/Blogs"
-@inject BlogHttpClient BlogHttpClient
+﻿@page "/{Id:guid}/Projects"
+@inject ProjectHttpClient ProjectHttpClient
+@inject UserBookmarkHttpClient UserBookmarkHttpClient
 @inject ManageAccountHttpClient ManageAccountHttpClient
-
 <div class="page-wrapper">
     <div class="page-header">
         <div class="container-xl">
@@ -9,12 +9,12 @@
                 <div class="col">
                     @if (_authorPublicInfo != null)
                     {
-                        <h1>@_authorPublicInfo.FullName's Blogs</h1>
+                        <h1>@_authorPublicInfo.Name's Projects</h1>
                     }
                 </div>
                 <div class="col-auto">
                     <button class="btn rounded-2" @onclick="@(() => LoadData(_pageNumber))">
-                        <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark" />
+                        <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark"/>
                         Refresh
                     </button>
                 </div>
@@ -26,23 +26,39 @@
             <div class="card mb-3">
                 <InputText Value="@_searchString" ValueChanged="Search" ValueExpression="@(() => _searchString)" class="form-control" placeholder="Search projects" />
             </div>
-            @if (_blogs.Count != 0)
+            <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
+            @if (_projects.Count != 0)
             {
-                <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
                 <div class="row row-deck">
-                    @foreach (var blog in _blogs)
+                    @foreach (var project in _projects)
                     {
                         <div class="col-sm-12 col-md-6 col-lg-3">
                             <div class="card">
-                                <div class="card-status-top bg-cyan"></div>
+                                <div class="card-status-start bg-cyan"></div>
                                 <div class="card-body">
-                                    <a href="@($"/Blog/{blog.Id}")" class="card-title">@blog.Title</a>
-                                    <h5>@blog.AuthorName</h5>
-                                    <p>@blog.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                                    <a class="card-title" href="@($"/Project/{project.Id}")">@project.Title</a>
+                                    @if (project.Ongoing)
+                                    {
+                                        <h5>@project.StartDate.ToString("MMMM,yyyy") - Ongoing</h5>
+                                    }
+                                    else
+                                    {
+                                        <h5>@project.StartDate.ToString("MMMM,yyyy") - @project.EndDate?.ToString("MMMM,yyyy")</h5>
+                                    }
+                                    @if (project.TeamProject)
+                                    {
+                                        <span class="badge bg-teal">Team Project</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-blue">Individual</span>
+                                    }
+                                    <p class="mt-2">@project.Description</p>
+                                    <i class="text-muted">@project.Tags</i>
                                 </div>
                                 <div class="card-footer">
                                     <div class="btn-list">
-                                        <button class="btn">
+                                        <button class="btn" @onclick="(() => ToggleBookmark(project.Id))">
                                             <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark"/>
                                             Bookmark
                                         </button>
@@ -57,8 +73,8 @@
             {
                 <div class="card">
                     <div class="empty">
-                        <p class="empty-title">No Blogs found!</p>
-                        <p class="empty-subtitle text-muted">Seems there is no blog from the author that matches your search!</p>
+                        <p class="empty-title">No Projects found!</p>
+                        <p class="empty-subtitle text-muted">Seems there is no project from the author that matches your search!</p>
                         <div class="empty-action">
                             <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo($"{Id}"))">
                                 <BSIcon Icon="@TablerIcons.List_details" />
@@ -72,8 +88,8 @@
             {
                 <div class="card">
                     <div class="empty">
-                        <p class="empty-title">No Blogs found!</p>
-                        <p class="empty-subtitle text-muted">Seems the author is yet to write his maiden blog!</p>
+                        <p class="empty-title">No Projects found!</p>
+                        <p class="empty-subtitle text-muted">Seems the author is yet to put his maiden project!</p>
                         <div class="empty-action">
                             <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo($"{Id}"))">
                                 <BSIcon Icon="@TablerIcons.List_details" />

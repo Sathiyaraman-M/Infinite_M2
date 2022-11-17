@@ -63,10 +63,10 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllProjects(int pageNumber, int pageSize, string searchString, string authorId)
+    public async Task<IActionResult> GetAllProjects(int pageNumber, int pageSize, string searchString, string authorId = null)
     {
         var userId = HttpContext.User.FindFirstValue(JwtClaimTypes.Subject);
-        var result = await _projectService.GetAllProjects(pageNumber, pageSize, searchString, authorId, userId);
+        var result = await _projectService.GetAllProjects(pageNumber, pageSize, searchString, string.IsNullOrEmpty(authorId) ? userId : authorId, userId);
         return Ok(result);
     }
 

@@ -1,0 +1,145 @@
+﻿@page "/Personal/Projects/New"
+@page "/Personal/Projects/{Id:guid}"
+@using Infinite.Base.Enums
+@inject ProjectHttpClient ProjectHttpClient
+<PageTitle>
+    @if (Id != Guid.Empty && Id != null)
+    {
+        @("Update project | Novel Infinite")                    
+    }
+    else
+    {
+        @("Add project | Novel Infinite")
+    }
+</PageTitle>
+<EditForm Model="Model" OnValidSubmit="SubmitAsync">
+    <div class="page-wrapper">
+        <div class="page-header">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col">
+                        @if (Id != Guid.Empty && Id != null)
+                        {
+                            <h2 class="page-title">Update project</h2>                    
+                        }
+                        else
+                        {
+                            <h2 class="page-title">Add project</h2>
+                        }
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn" type="button" @onclick="NavigationService.NavigateBack">Cancel</button>
+                            @if (Id != Guid.Empty && Id != null)
+                            {
+                                <button class="btn btn-success" type="submit">Publish Changes</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-success" type="submit">Publish</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-9 mb-2">
+                                <label class="form-label">Title</label>
+                                <InputText class="form-control" @bind-Value="@Model.Title" />
+                            </div>
+                            <div class="col-sm-12 col-md-3 mb-2">
+                                <label class="form-label">Visibility</label>
+                                <InputSelect @bind-Value="@Model.Visibility" class="form-select form-control-sm">
+                                    <option value="@Visibility.Public">Public</option>
+                                    <option value="@Visibility.Private">Private</option>
+                                    <option value="@Visibility.Unlisted">Unlisted</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <label class="form-label">Description</label>
+                                <InputTextArea @bind-Value="@Model.Description" class="form-control"></InputTextArea>
+                            </div>
+                        </div>
+                        <div class="row row-deck">
+                            <div class="col-sm-12 col-lg-6">
+                                <fieldset class="form-fieldset mt-2 w-100">
+                                    <div class="w-100">
+                                        <h3>Authors</h3>
+                                        <InputRadioGroup TValue="bool" ValueChanged="ChangeAuthorMode"
+                                                         ValueExpression="() => Model.TeamProject" Value="Model.TeamProject">
+                                            <label class="form-check form-check-inline">
+                                                <InputRadio class="form-check-input" TValue="bool" Value="@false"/>
+                                                <span class="form-check-label">Individual</span>
+                                            </label>
+                                            <label class="form-check form-check-inline">
+                                                <InputRadio class="form-check-input" TValue="bool" Value="@true"/>
+                                                <span class="form-check-label">Team Project</span>
+                                            </label>
+                                        </InputRadioGroup>
+                                    </div>
+                                    <div class="w-100">
+                                        @if (Model.TeamProject)
+                                        {
+                                            <div class="d-flex flex-wrap mb-2">
+                                                @if (Model.Authors != null)
+                                                {
+                                                    @foreach (var author in Model.Authors)
+                                                    {
+                                                        <span class="badge bg-blue-lt h4 me-2">@author.Name</span>
+                                                    }
+                                                }
+                                            </div>
+                                            <button type="button" class="btn" @onclick="UpdateAuthors">
+                                                <BSIcon Icon="@TablerIcons.Plus" Color="Color.Dark" />
+                                                Add Authors
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-blue-lt h4">@_userName</span>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col-sm-12 col-lg-6">
+                                <fieldset class="form-fieldset mt-2 w-100">
+                                    <h3>Project Duration</h3>
+                                    <label class="form-check form-check-inline">
+                                        <InputCheckbox class="form-check-input" Value="Model.Ongoing" ValueExpression="@(() => Model.Ongoing)"
+                                                       ValueChanged="@((s) => { Model.EndDate = DateTime.Now; Model.Ongoing = s; })" />
+                                        <span class="form-check-label">Ongoing</span>
+                                    </label>
+                                    <div class="row mt-2">
+                                        <div class="col-sm-12 col-lg-6 mb-2">
+                                            <label class="form-label">Start Date</label>
+                                            <InputDate @bind-Value="@Model.StartDate" class="form-control" Type="InputDateType.Month" />
+                                        </div>  
+                                        <div class="col-sm-12 col-lg-6 mb-2">
+                                            <label class="form-label">End Date</label>
+                                            <InputDate disabled="@Model.Ongoing" @bind-Value="@Model.EndDate" class="form-control" Type="InputDateType.Month"/>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-2">
+                                <label class="form-label">Tags</label>
+                                <InputText class="form-control" @bind-Value="@Model.Tags" />
+                            </div>
+                            <div class="col-12 mb-2">
+                                <label class="form-label">Abstract</label>
+                                <InputTextArea @bind-Value="@Model.Abstract" class="form-control"></InputTextArea>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>

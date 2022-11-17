@@ -1,0 +1,205 @@
+﻿@page "/Personal/Projects/{Id:guid}/Blogs"
+@inject ProjectHttpClient ProjectHttpClient
+<EditForm Model="Request" OnValidSubmit="SubmitAsync">
+    <div class="page-wrapper">
+        <div class="page-header">
+            <div class="container-xl">
+            @if (_project != null)
+            {
+                <div class="row">
+                    <div class="col">
+                        <div class="page-title">Link Blogs : @_project.Title</div>
+                        <div class="page-pretitle">Select Blogs to be linked to your project</div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn" type="button" @onclick="@(() => NavigationManager.NavigateTo("/Personals"))">Skip</button>
+                            <button class="btn btn-cyan" type="submit">Save Project Blogs</button>
+                        </div>
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <label class="form-label">Search the blog to add</label>
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <BlazoredTypeahead TItem="MinifiedBlogResponse" TValue="MinifiedBlogResponse" class="form-control"
+                                                       @bind-Value="_blogResponse" SearchMethod="SearchBlog" Context="blog">
+                                        <ResultTemplate>
+                                            @blog.Title
+                                        </ResultTemplate>
+                                        <SelectedTemplate>
+                                            @blog.Title
+                                        </SelectedTemplate>
+                                    </BlazoredTypeahead>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="btn-list">
+                                        <button class="btn" type="button" @onclick="Add">
+                                            <BSIcon Icon="@TablerIcons.Plus" Color="Color.Dark"/>
+                                            Add Blog
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-2">
+                            Note that you can add only the blogs that you and other project contributors have created already.
+                            Also, Private blogs won't show up here.
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table table-vcenter">
+                                <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Created Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @if ((Request.Blogs?.Count ?? 0) > 0)
+                                {
+                                    @foreach (var blog in Request.Blogs)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="text-muted">@(Request.Blogs.IndexOf(blog) + 1)</span>
+                                                <div class="btn-list">
+                                                    <button class="btn btn-icon" type="button" disabled="@(Request.Blogs.IndexOf(blog) == 0)" @onclick="@(() => MoveUp(Request.Blogs.IndexOf(blog)))">
+                                                        <BSIcon Icon="@TablerIcons.Arrow_up" Color="Color.Dark" />
+                                                    </button>
+                                                    <button class="btn btn-icon" type="button" disabled="@(Request.Blogs.IndexOf(blog) == Request.Blogs.Count - 1)" @onclick="@(() => MoveDown(Request.Blogs.IndexOf(blog)))">
+                                                        <BSIcon Icon="@TablerIcons.Arrow_down" Color="Color.Dark" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>@blog.Title</td>
+                                            <td>@blog.AuthorName</td>
+                                            <td>@blog.CreatedDate.ToString("MMMM dd, YYYY")</td>
+                                            <td>
+                                                <button class="btn" type="button" @onclick="@(() => { Request.Blogs.Remove(blog); StateHasChanged(); })">
+                                                    <BSIcon Icon="@TablerIcons.X" Color="Color.Dark" />
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private ProjectBlogsRequest Request { get; set; } = new();
+
+    private GetBlogsRequest _getBlogsRequest = new();
+
+    private MinifiedBlogResponse _blogResponse = new();
+
+    private FullProjectResponse _project = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Request.Id = Id.ToString();
+        var projectResult = await ProjectHttpClient.GetFullProject(Id.ToString());
+        if (projectResult.Succeeded)
+        {
+            _project = projectResult.Data;
+            var result = await ProjectHttpClient.GetProjectAuthors(Id.ToString());
+            if (result?.Succeeded ?? false)
+            {
+                _getBlogsRequest.AuthorIds = result.Data;
+                var projectBlogsResult = await ProjectHttpClient.GetProjectBlogs(Id.ToString());
+                if (projectBlogsResult?.Succeeded ?? false)
+                    Request.Blogs = projectBlogsResult.Data.OrderBy(x => x.Index).Select(x => new MinifiedBlogResponse()
+                    {
+                        AuthorName = x.AuthorName,
+                        CreatedDate = x.CreatedDate,
+                        Id = x.Id,
+                        Title = x.Title
+                    }).ToList();
+            }
+            else
+            {
+                foreach (var message in result!.Messages)
+                {
+                    Toast.Add("Error", message, Severity.Error);
+                }
+            }
+        }
+        else
+        {
+            foreach (var message in projectResult.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+
+    private async Task<IEnumerable<MinifiedBlogResponse>> SearchBlog(string searchString)
+    {
+        _getBlogsRequest.SearchString = searchString;
+        var result = await ProjectHttpClient.SearchBlogs(_getBlogsRequest);
+        return result.Data ?? new List<MinifiedBlogResponse>();
+    }
+
+    private void MoveUp(int index)
+    {
+        (Request.Blogs[index - 1], Request.Blogs[index]) = (Request.Blogs[index], Request.Blogs[index - 1]);
+    }
+
+    private void MoveDown(int index)
+    {
+        (Request.Blogs[index], Request.Blogs[index + 1]) = (Request.Blogs[index + 1], Request.Blogs[index]);
+    }
+
+    private void Add()
+    {
+        if (Request.Blogs.Contains(_blogResponse))
+        {
+            Toast.Add("Message", "Selected Blog is already in the list", Severity.Info);
+        }
+        else
+        {
+            
+            Request.Blogs.Add(_blogResponse);
+            _blogResponse = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        var result = await ProjectHttpClient.SaveProjectBlogs(Request);
+        if (result.Succeeded)
+        {
+            Toast.Add("Success", result.Messages[0], Severity.Success);
+            NavigationManager.NavigateTo($"/Project/{Id}");
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+}

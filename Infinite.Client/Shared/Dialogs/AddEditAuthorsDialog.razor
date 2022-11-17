@@ -16,7 +16,7 @@
                     </BlazoredTypeahead>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-icon" @onclick="Add">
+                    <button type="button" class="btn btn-icon" @onclick="Add">
                         <BSIcon Icon="@TablerIcons.Plus" Color="Color.Dark" />
                     </button>
                 </div>
@@ -30,17 +30,20 @@
                     </tr>
                     </thead>
                     <tbody>
-                        @foreach (var author in Authors)
+                        @if (Authors != null)
                         {
-                            <tr>
-                                <td>@author.Name</td>
-                                <td>
-                                    <button class="btn" disabled="@(author.Id == _userId)" @onclick="@(() => { Authors.Remove(author); StateHasChanged(); })">
-                                        <BSIcon Icon="@TablerIcons.X" Color="Color.Dark" />
-                                        Remove
-                                    </button>
-                                </td>
-                            </tr>                            
+                            @foreach (var author in Authors)
+                            {
+                                <tr>
+                                    <td>@author.Name</td>
+                                    <td>
+                                        <button class="btn" disabled="@(author.Id == _userId)" @onclick="@(() => { Authors.Remove(author); StateHasChanged(); })">
+                                            <BSIcon Icon="@TablerIcons.X" Color="Color.Dark"/>
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -48,7 +51,7 @@
         </DialogContent>
         <DialogActions>
             <button class="btn btn-primary" type="submit">Submit</button>
-            <button class="btn" @onclick="ArcDialog.Cancel">Cancel</button>
+            <button class="btn" type="button" @onclick="ArcDialog.Cancel">Cancel</button>
         </DialogActions>
     </Dialog>
 </EditForm>

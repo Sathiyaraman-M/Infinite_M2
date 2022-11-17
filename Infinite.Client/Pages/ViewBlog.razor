@@ -149,7 +149,7 @@ else
             {
                 RecentFromAuthor = recentResult.Data;
             }
-            IsAuthenticated = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
+            IsAuthenticated = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity?.IsAuthenticated ?? false;
             if (IsAuthenticated)
             {
                 var isBookmarkedResult = await UserBookmarkHttpClient.IsBlogBookmarked(Id);

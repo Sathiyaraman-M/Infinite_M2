@@ -53,7 +53,7 @@ public class ProjectHttpClient
         string searchString, string authorId)
     {
         return await _httpClient.GetFromJsonAsync<PaginatedResult<MinifiedProjectResponse>>(
-            $"api/projects?pageNumber={pageNumber}&pageSize={pageSize}&searchString={searchString}");
+            $"api/projects?pageNumber={pageNumber}&pageSize={pageSize}&searchString={searchString}&authorId={authorId}");
     }
 
     public async Task<IResult<string>> SaveProject(EditProjectRequest request)
