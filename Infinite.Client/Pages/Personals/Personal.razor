@@ -1,0 +1,272 @@
+﻿@page "/Personal"
+@inject BlogHttpClient BlogHttpClient
+<PageTitle>Personal Info | Novel Infinite</PageTitle>
+@if (_isMdLoaded && _isProjectsLoaded && _isBlogsLoaded && _isBlogDraftsLoaded)
+{
+    <div class="page-wrapper">
+        <div class="page-header">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col">
+                        <div class="page-title">Your Portfolio</div>
+                        <div class="page-pretitle">Use this section to express yourself who you are</div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-list">
+                            <button class="btn" @onclick="@(() => NavigationManager.NavigateTo("Personal/Portfolio"))">
+                                <BSIcon Icon="@TablerIcons.Pencil" Color="Color.Dark" />
+                                Edit
+                            </button>
+                            <button class="btn" @onclick="@InvokeShareDialog">
+                                <BSIcon Icon="@TablerIcons.Share" Color="Color.Dark" />
+                                Share
+                            </button>
+                            <button class="btn" @onclick="@(() => NavigationManager.NavigateTo("Personal/Settings"))">
+                                <BSIcon Icon="@TablerIcons.Settings" Color="Color.Dark" />
+                                Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        @if (string.IsNullOrEmpty(_userPortFolioMd))
+                        {
+                            <div class="w-100 d-flex justify-center">
+                                <div class="w-100 d-flex flex-column align-items-center">
+                                    <h3>Looks like you haven't created a portfolio yet!</h3>
+                                    <div class="d-flex justify-center">
+                                        <button class="btn btn-cyan mt-1" @onclick="@(() => NavigationManager.NavigateTo("Personal/Portfolio"))">
+                                            <BSIcon Icon="@TablerIcons.Plus" />
+                                            Create One
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            @(new MarkupString(Markdown.ToHtml(_userPortFolioMd, Pipeline)))
+                        }
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between my-2">
+                    <h2>Your Projects</h2>
+                    <div class="d-flex align-center">
+                        <button class="btn btn-cyan rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/New"))">
+                            <BSIcon Icon="@TablerIcons.Plus" />
+                            Add Project
+                        </button>
+                        <button class="btn rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects"))">
+                            <BSIcon Icon="@TablerIcons.List_details" Color="Color.Dark" />
+                            View All
+                        </button>
+                        <button class="btn rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/Liked"))">
+                            <BSIcon Icon="@TablerIcons.Heart" Color="Color.Dark" />
+                            View your Liked Projects
+                        </button>
+                        <button class="btn rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/Bookmarks"))">
+                            <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark" />
+                            View your Bookmarks
+                        </button>
+                    </div>
+                </div>
+                @if (_myLast4Projects.Count == 0)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="w-100 d-flex justify-center">
+                                <div class="w-100 d-flex flex-column align-items-center">
+                                    <h3>Looks like you haven't added any project yet!</h3>
+                                    <div class="d-flex justify-center">
+                                        <button class="btn btn-cyan mt-1" @onclick="@(() => NavigationManager.NavigateTo("/Personal/Projects/New"))">
+                                            <BSIcon Icon="@TablerIcons.Plus" />
+                                            Add one
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row row-deck">
+                        @foreach (var project in _myLast4Projects)
+                        {
+                            <div class="col-sm-12 col-md-6 col-lg-3">
+                                <div class="card">
+                                    <div class="card-status-start bg-cyan"></div>
+                                    <div class="card-body">
+                                        <a class="card-title" href="@($"/Project/{project.Id}")">@project.Title</a>
+                                        @if (project.Ongoing)
+                                        {
+                                            <h5>@project.StartDate.ToString("MMMM,yyyy") - Ongoing</h5>
+                                        }
+                                        else
+                                        {
+                                            <h5>@project.StartDate.ToString("MMMM,yyyy") - @project.EndDate?.ToString("MMMM,yyyy")</h5>
+                                        }
+                                        @if (project.TeamProject)
+                                        {
+                                            <span class="badge bg-teal">Team Project</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-blue">Individual</span>
+                                        }
+                                        <p class="mt-2">@project.Description</p>
+                                        <i class="text-muted">@project.Tags</i>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="btn-list">
+                                            <button class="btn btn-yellow" @onclick="@(() => NavigationManager.NavigateTo($"/Personal/Projects/{project.Id}"))">
+                                                <BSIcon Icon="@TablerIcons.Pencil" />
+                                                Edit
+                                            </button>
+                                            <button class="btn btn-danger" @onclick="@(() => DeleteProjectAsync(project.Id))">
+                                                <BSIcon Icon="@TablerIcons.Trash" />
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                <div class="d-flex justify-content-between mt-4 my-2">
+                    <h2>Your Blogs</h2>
+                    <div class="d-flex align-center">
+                        <button class="btn btn-cyan rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs/New"))">
+                            <BSIcon Icon="@TablerIcons.Plus" />
+                            New Blog
+                        </button>
+                        <button class="btn rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs"))">
+                            <BSIcon Icon="@TablerIcons.List_details" Color="Color.Dark" />
+                            View All
+                        </button>
+                        <button class="btn rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs/Liked"))">
+                            <BSIcon Icon="@TablerIcons.Heart" Color="Color.Dark" />
+                            View your Liked Blogs
+                        </button>
+                        <button class="btn rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs/Bookmarks"))">
+                            <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark" />
+                            View your Bookmarks
+                        </button>
+                    </div>
+                </div>
+                @if (_myLast4Blogs.Count == 0)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="w-100 d-flex justify-center">
+                                <div class="w-100 d-flex flex-column align-items-center">
+                                    <h3>Looks like you haven't added any blog yet!</h3>
+                                    <div class="d-flex justify-center">
+                                        <button class="btn btn-cyan mt-1" @onclick="@(() => NavigationManager.NavigateTo("/Personal/Blogs/New"))">
+                                            <BSIcon Icon="@TablerIcons.Plus" />
+                                            Add one
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row row-deck">
+                        @foreach (var blog in _myLast4Blogs)
+                        {
+                            <div class="col-sm-12 col-md-6 col-lg-3">
+                                <div class="card">
+                                    <div class="card-status-start bg-cyan"></div>
+                                    <div class="card-body">
+                                        <a class="card-title" href="@($"/Blog/{blog.Id}")">@blog.Title</a>
+                                        <h5>@blog.AuthorName</h5>
+                                        <p>@blog.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="btn-list">
+                                            <button class="btn btn-yellow" @onclick="@(() => NavigationManager.NavigateTo($"/Personal/Blogs/{blog.Id}"))">
+                                                <BSIcon Icon="@TablerIcons.Pencil" />
+                                                Edit
+                                            </button>
+                                            <button class="btn btn-danger" @onclick="@(() => DeleteBlogAsync(blog.Id))">
+                                                <BSIcon Icon="@TablerIcons.Trash" />
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                <div class="d-flex justify-content-between align-center mt-4 my-2">
+                    <h2>Your Saved Drafts</h2>
+                    @if (_myLast4BlogDrafts.Count != 0)
+                    {
+                        <div class="d-flex align-center">
+                            <button class="btn rounded-2" @onclick="@(() => NavigationManager.NavigateTo($"/Personal/Blogs/Drafts"))">
+                                <BSIcon Icon="@TablerIcons.List_details" Color="Color.Dark" />
+                                View All
+                            </button>
+                        </div>
+                    }
+                </div>
+                @if (_myLast4BlogDrafts.Count == 0)
+                {
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="w-100 d-flex justify-center">
+                                <div class="w-100 d-flex flex-column align-items-center">
+                                    <h3>No Saved Drafts!</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row row-deck">
+                        @foreach (var blogDraft in _myLast4BlogDrafts)
+                        {
+                            <div class="col-sm-12 col-md-6 col-lg-3">
+                                <div class="card">
+                                    <div class="card-status-start bg-cyan"></div>
+                                    <div class="card-body">
+                                        <a class="card-title" href="@($"/Personal/Drafts/{blogDraft.Id}")">
+                                            @blogDraft.Title
+                                        </a>
+                                        <h5>@blogDraft.AuthorName</h5>
+                                        <p>Last worked on @blogDraft.SaveDateTime.ToString("MMMM dd, yyyy")</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="btn-list">
+                                            <button class="btn btn-danger" @onclick="(() => DiscardDraftAsync(blogDraft.Id))">
+                                                <BSIcon Icon="@TablerIcons.Trash" />
+                                                Discard
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="progress progress-sm">
+        <div class="progress-bar progress-bar-indeterminate"></div>
+    </div>
+}

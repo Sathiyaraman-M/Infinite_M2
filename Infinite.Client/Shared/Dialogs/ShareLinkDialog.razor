@@ -1,0 +1,24 @@
+﻿<Dialog>
+    <DialogContent>
+        <div class="input-group w-100">
+            <InputText class="form-control" ValueExpression="@(() => Link)" readonly Value="@Link"/>
+            <button class="btn btn-icon">
+                <BSIcon Icon="@TablerIcons.Copy" Color="Color.Dark" />
+            </button>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <button class="btn" @onclick="@(() => ArcDialog.Close())">
+            <BSIcon Icon="@TablerIcons.X" Color="Color.Dark" />
+            Close
+        </button>
+    </DialogActions>
+</Dialog>
+
+@code {
+    [CascadingParameter]
+    public DialogInstance ArcDialog { get; set; }
+    
+    [Parameter]
+    public string Link { get; set; }
+}
