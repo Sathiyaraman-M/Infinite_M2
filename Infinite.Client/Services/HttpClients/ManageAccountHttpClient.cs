@@ -26,7 +26,7 @@ public class ManageAccountHttpClient
 
     public async Task<IResult> SaveUserPortfolio(string markdown)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/manage/portfolio", markdown);
+        var response = await _httpClient.PostAsJsonAsync("api/manage/portfolio", new { Markdown = markdown });
         return await response.ToResult();
     }
 

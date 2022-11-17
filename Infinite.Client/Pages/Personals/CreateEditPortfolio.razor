@@ -1,0 +1,132 @@
+﻿@page "/Personal/Portfolio"
+@inject ManageAccountHttpClient ManageAccountHttpClient
+<PageTitle>
+    @if (!_isEdit)
+    {
+        @("Create a Portfolio")
+    }
+    else
+    {
+        @("Edit your portfolio")
+    }
+</PageTitle>
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="page-title">Portfolio Editor</div>
+                    <div class="page-pretitle">
+                        @if (!_isEdit)
+                        {
+                            @("Create a Portfolio")
+                        }
+                        else
+                        {
+                            @("Edit your portfolio")
+                        }
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" @onclick="SaveAsync">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-fluid">
+            @if (_isLoaded)
+            {
+                <div class="row row-deck">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Content</div>
+                            </div>
+                            <div class="px-2 py-2">
+                                <textarea rows="@Rows" class="form-control w-100" style="overflow-y: visible" @bind="@UserProfileMd" @bind:event="oninput"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Preview</div>
+                            </div>
+                            <div class="card-body">
+                                @(new MarkupString(Markdown.ToHtml(UserProfileMd)))
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="progress progress-sm">
+                    <div class="progress-bar progress-bar-indeterminate"></div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private string _userPortFolioMd;
+
+    private string UserProfileMd
+    {
+        get => _userPortFolioMd;
+        set
+        {
+            _userPortFolioMd = value;
+            CalculateSize(value);
+        }
+    }
+    private bool _isLoaded;
+    private bool _isEdit;
+    private int Rows { get; set; }
+
+    private void CalculateSize(string value)
+    {
+        Rows = Math.Max(value.Split('\n').Length, value.Split('\r').Length);
+        Rows = Math.Max(Rows, 2);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ManageAccountHttpClient.GetUserPortfolio();
+        if (result!.Succeeded)
+        {
+            UserProfileMd = result.Data;
+            if (!string.IsNullOrEmpty(UserProfileMd))
+                _isEdit = true;
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+        await base.OnInitializedAsync();
+        _isLoaded = true;
+    }
+
+    private async Task SaveAsync()
+    {
+        var result = await ManageAccountHttpClient.SaveUserPortfolio(UserProfileMd);
+        if (result.Succeeded)
+        {
+            Toast.Add("Success", result.Messages.FirstOrDefault(), Severity.Success);
+            NavigationManager.NavigateTo("/Personal");
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+}
