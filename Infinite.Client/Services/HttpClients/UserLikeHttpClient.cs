@@ -11,6 +11,11 @@ public class UserLikeHttpClient
     {
         _httpClient = httpClient;
     }
+
+    public static UserLikeHttpClient UseCustomHttpClient(HttpClient httpClient)
+    {
+        return new UserLikeHttpClient(httpClient);
+    }
     
     public async Task<IResult<LikeResponse>> IsBlogLiked(Guid blogId)
     {

@@ -12,6 +12,11 @@ public class UserBookmarkHttpClient
         _httpClient = httpClient;
     }
 
+    public static UserBookmarkHttpClient UseCustomHttpClient(HttpClient httpClient)
+    {
+        return new UserBookmarkHttpClient(httpClient);
+    }
+
     public async Task<IResult<bool>> IsBlogBookmarked(Guid blogId)
     {
         return await _httpClient.GetFromJsonAsync<Result<bool>>($"api/user/bookmarks/blog/{blogId}");

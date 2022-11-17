@@ -15,6 +15,7 @@ public class BlogController : ControllerBase
         _blogService = blogService;
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetFullBlog(string id)
     {
@@ -31,6 +32,7 @@ public class BlogController : ControllerBase
         return Ok(result);
     }
 
+    [AllowAnonymous]
     [HttpGet("recent")]
     [HttpGet("recent/{authorId}")]
     public async Task<IActionResult> GetRecentNBlogs(string authorId = null, string exclude = null, int n = 4)
@@ -52,7 +54,7 @@ public class BlogController : ControllerBase
     public async Task<IActionResult> GetAllBlogs(int pageNumber, int pageSize, string searchString, string authorId)
     {
         var userId = HttpContext.User.FindFirstValue(JwtClaimTypes.Subject);
-        var result = await _blogService.GetAllBlogs(pageNumber, pageSize, searchString, authorId, userId);
+        var result = await _blogService.GetAllBlogs(pageNumber, pageSize, searchString, string.IsNullOrEmpty(authorId) ? userId : authorId, userId);
         return Ok(result);
     }
 
