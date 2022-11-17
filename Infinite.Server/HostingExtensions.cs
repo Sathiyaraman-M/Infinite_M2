@@ -97,14 +97,4 @@ public static class HostingExtensions
         services.AddTransient<IProjectService, ProjectService>();
         services.AddTransient<IUserLikesService, UserLikesService>();
     }
-
-    public static WebApplication RegisterEndpoints(this WebApplication app)
-    {
-        //app.RegisterBlogEndpoints();
-        //app.RegisterManageAccountEndpoints();
-        //app.RegisterProjectEndpoints();
-        //app.RegisterUserLikesEndpoints();
-        //app.RegisterUserBookmarksEndpoints();
-        return app;
-    }
 }

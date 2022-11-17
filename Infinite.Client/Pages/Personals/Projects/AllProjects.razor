@@ -1,0 +1,157 @@
+﻿@page "/Personal/Projects"
+@inject ProjectHttpClient ProjectHttpClient
+<PageTitle>Your Projects | Novel Infinite</PageTitle>
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col">
+                    <div class="page-title">Your Projects</div>
+                    <div class="page-pretitle">Find all your projects here</div>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary d-none d-sm-inline-block" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/New"))">
+                        <BSIcon Icon="@TablerIcons.Plus" />
+                        Create New
+                    </button>
+                    <button class="btn d-none d-sm-inline-block" @onclick="@(() => LoadData(_pageNumber))">
+                        <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark" />
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="card mb-3">
+                <InputText Value="@_searchString" ValueChanged="Search" ValueExpression="@(() => _searchString)" class="form-control" placeholder="Search blogs" />
+            </div>
+            @if (_projects.Count != 0)
+            {
+                <div class="row row-deck mb-3">
+                    @foreach (var project in _projects)
+                    {
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <div class="card">
+                                <div class="card-status-start bg-cyan"></div>
+                                <div class="card-body">
+                                    <a class="card-title" href="@($"/Project/{project.Id}")">@project.Title</a>
+                                    @if (project.Ongoing)
+                                    {
+                                        <h5>@project.StartDate.ToString("MMMM,yyyy") - Ongoing</h5>
+                                    }
+                                    else
+                                    {
+                                        <h5>@project.StartDate.ToString("MMMM,yyyy") - @project.EndDate?.ToString("MMMM,yyyy")</h5>
+                                    }
+                                    @if (project.TeamProject)
+                                    {
+                                        <span class="badge bg-teal">Team Project</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-blue">Individual</span>
+                                    }
+                                    <p class="mt-2">@project.Description</p>
+                                    <i class="text-muted">@project.Tags</i>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="btn-list">
+                                        <button class="btn btn-yellow" @onclick="@(() => NavigationManager.NavigateTo($"/Personal/Projects/{project.Id}"))">
+                                            <BSIcon Icon="@TablerIcons.Pencil" />
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="@(() => DeleteAsync(project.Id))">
+                                            <BSIcon Icon="@TablerIcons.Trash" />
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="empty">
+                        <p class="empty-title">No Projects added!</p>
+                        <p class="empty-subtitle text-muted">Don't let your projects catalog be empty!</p>
+                        <div class="empty-action">
+                            <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/New"))">
+                                <BSIcon Icon="@TablerIcons.Plus" />
+                                Click to add one
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _authorId;
+    private int _pageNumber;
+    private int _pageSize;
+    private int _totalPages;
+    private string _searchString;
+    private List<MinifiedProjectResponse> _projects = new();
+
+    private async Task Search(string value)
+    {
+        _searchString = value;
+        _pageNumber = 1;
+        await LoadData(_pageNumber);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pageNumber = 1;
+        _pageSize = 12;
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _authorId = user.FindFirstValue("sub");
+        await base.OnInitializedAsync();
+        await LoadData(1);
+    }
+
+    private async Task LoadData(int pageNumber)
+    {
+        var result = await ProjectHttpClient.GetAllProjects(pageNumber, _pageSize, _searchString, _authorId);
+        if (result!.Succeeded)
+        {
+            _projects = result.Data;
+            _pageNumber = result.CurrentPage;
+            _pageSize = result.PageSize;
+            _totalPages = result.TotalPages;
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+
+    private async Task DeleteAsync(string id)
+    {
+        if (await DialogService.ShowMessageBox("Confirm Delete", "Are you sure want to delete this project? This action cannot be undone", "Yes", "No", options: new DialogOptions { Position = DialogPosition.Centered }) == true)
+        {
+            var result = await ProjectHttpClient.DeleteProject(id);
+            if (result!.Succeeded)
+            {
+                Toast.Add("Success", result.Messages[0], Severity.Success);
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    Toast.Add("Error", message, Severity.Error);
+                }
+            }
+        }
+    }
+}
