@@ -1,6 +1,6 @@
 ﻿using Infinite.Base.Responses;
 
-namespace Infinite.Client.Pages.Personal.Blogs;
+namespace Infinite.Client.Pages.Personals.Blogs;
 
 public partial class AllBlogDrafts
 {

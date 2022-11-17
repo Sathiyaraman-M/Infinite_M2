@@ -4,7 +4,7 @@ using Infinite.Base.Requests;
 using Infinite.Base.Responses;
 using Microsoft.AspNetCore.Components;
 
-namespace Infinite.Client.Pages.Personal.Blogs;
+namespace Infinite.Client.Pages.Personals.Blogs;
 
 public partial class CreateEditBlog
 {
