@@ -1,0 +1,139 @@
+﻿@page "/Personal/Projects/Liked"
+@inject UserLikeHttpClient UserLikeHttpClient
+<PageTitle>Your Liked Projects | Novel Infinite</PageTitle>
+<div class="page-wrapper">
+    <div class="page-header">
+        <div class="container-xl">
+            <div class="row g-2">
+                <div class="col">
+                    <div class="page-title">Your Liked Projects</div>
+                    <div class="page-pretitle">Find all your liked projects here</div>
+                </div>
+                <div class="col-auto">
+                    <button class="btn" @onclick="@(() => LoadData(_pageNumber))">
+                        <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark"/>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            @if (_projects.Count != 0)
+            {
+                <Pagination CurrentPage="_pageNumber" TotalPages="_totalPages" PageChanged="LoadData" Class="mb-3"/>
+                <div class="row row-deck">
+                    @foreach (var project in _projects)
+                    {
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <div class="card">
+                                <div class="card-status-start bg-cyan"></div>
+                                <div class="card-body">
+                                    <a class="card-title" href="@($"/Project/{project.Id}")">@project.Title</a>
+                                    @if (project.Ongoing)
+                                    {
+                                        <h5>@project.StartDate.ToString("MMMM,yyyy") - Ongoing</h5>
+                                    }
+                                    else
+                                    {
+                                        <h5>@project.StartDate.ToString("MMMM,yyyy") - @project.EndDate?.ToString("MMMM,yyyy")</h5>
+                                    }
+                                    @if (project.TeamProject)
+                                    {
+                                        <span class="badge bg-teal">Team Project</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-blue">Individual</span>
+                                    }
+                                    <p class="mt-2">@project.Description</p>
+                                    <i class="text-muted">@project.Tags</i>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="btn-list">
+                                      <button class="btn" @onclick="(() => RemoveFromLiked(project.Id))">
+                                          <BSIcon Icon="@TablerIcons.Heart_off" Color="Color.Dark" />
+                                          Unlike
+                                      </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="empty">
+                        <p class="empty-title">No Liked Projects!</p>
+                        <p class="empty-subtitle text-muted">Liked Projects is a great way to store your favorite projects publicly!</p>
+                        <div class="empty-action">
+                            <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("Explore"))">
+                                <BSIcon Icon="@TablerIcons.Plus" />
+                                Explore Projects!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private int _pageNumber;
+    private int _pageSize;
+    private int _totalPages;
+    private List<MinifiedProjectResponse> _projects = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pageNumber = 1;
+        _pageSize = 12;
+        await base.OnInitializedAsync();
+        await LoadData(_pageNumber);
+    }
+
+    private async Task LoadData(int pageNumber)
+    {
+        var result = await UserLikeHttpClient.GetLikedProjects(pageNumber, _pageSize);
+        if (result!.Succeeded)
+        {
+            _projects = result.Data;
+            _pageNumber = result.CurrentPage;
+            _pageSize = result.PageSize;
+            _totalPages = result.TotalPages;
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+
+    private async Task RemoveFromLiked(string projectId)
+    {
+        if (await DialogService.ShowMessageBox("Confirm Unlike", "Are you sure want to remove the project from Liked Projects?",
+            "Yes", "No", options: new DialogOptions { Position = DialogPosition.Centered }) == true)
+        {
+            var result = await UserLikeHttpClient.ToggleProjectLike(Guid.Parse(projectId));
+            if (result.Succeeded)
+            {
+                await LoadData(_pageNumber);
+                Toast.Add("Success", "Removed from Liked successfully", Severity.Info);
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    Toast.Add("Error", message, Severity.Error);
+                }
+            }
+        }
+    }
+
+}
