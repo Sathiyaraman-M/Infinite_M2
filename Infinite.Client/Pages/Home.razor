@@ -1,0 +1,165 @@
+﻿@page "/home"
+<PageTitle>Home | Novel Infinite</PageTitle>
+<AuthorizeView>
+    <div class="page-wrapper">
+        <div class="page-header">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col">
+                        <div class="page-title">Home</div>
+                        <div class="page-pretitle">@($"Welcome {context.User.Identity?.Name}!")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <CustomCarousel Id="sample0" Items="Enumerable.Range(1, 11).ToList()" Title="Explore new projects">
+                    <CardTemplate Context="card">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <div class="card-title">Sample Project @card</div>
+                            </div>
+                            <div class="card-body">
+                                Sample Card
+                            </div>
+                        </div>
+                    </CardTemplate>
+                </CustomCarousel>
+                <CustomCarousel Id="sample1" Items="Enumerable.Range(1, 11).ToList()" Title="Explore new blogs">
+                    <CardTemplate Context="card">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <div class="card-title">Sample Blog @card</div>
+                            </div>
+                            <div class="card-body">
+                                Sample Card
+                            </div>
+                        </div>
+                    </CardTemplate>
+                </CustomCarousel>
+                @if (_isProjectsLoaded)
+                {
+                    @if (_myLast12Projects.Count == 0)
+                    {
+                        <div class="mt-2 mb-4">
+                            <h2>Your Projects</h2>
+                            <div class="card">
+                                <div class="empty">
+                                    <div class="empty-title">No projects added!</div>
+                                    <div class="empty-subtitle text-muted">Don't let your project catalog be empty!</div>
+                                    <div class="empty-actions">
+                                        <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/New"))">
+                                            Click to add one
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <CustomCarousel Id="sample2" Items="_myLast12Projects" Title="Your Projects">
+                            <CardTemplate Context="project">
+                                <div class="card h-100">
+                                    <div class="card-status-top bg-cyan"></div>
+                                    <div class="card-body">
+                                        <a class="card-title" href="@($"/Project/{project.Id}")">@project.Title</a>
+                                        <h5>@project.StartDate.ToString("MMMM,yyyy") - @project.EndDate?.ToString("MMMM,yyyy")</h5>
+                                        @if (project.TeamProject)
+                                        {
+                                            <span class="badge bg-teal">Team Project</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-blue">Individual</span>
+                                        }
+                                        <p class="mt-2">@project.Description</p>
+                                    </div>
+                                </div>
+                            </CardTemplate>
+                        </CustomCarousel>
+                    }
+                }
+                else
+                {
+                    <div class="progress progress-sm">
+                        <div class="progress-bar progress-bar-indeterminate"></div>
+                    </div>
+                }
+                @if (_isBlogsLoaded)
+                {
+                    @if (_myLast12Blogs.Count == 0)
+                    {
+                        <div class="mt-2 mb-4">
+                            <h2>Your Blogs</h2>
+                            <div class="card">
+                                <div class="empty">
+                                    <div class="empty-title">No Blogs added!</div>
+                                    <div class="empty-subtitle text-muted">Don't let your blogs catalog be empty!</div>
+                                    <div class="empty-actions">
+                                        <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs/New"))">
+                                            Click to add one
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <CustomCarousel Id="sample3" Items="_myLast12Blogs" Title="Your Blogs">
+                            <CardTemplate Context="blog">
+                                <div class="card h-100">
+                                    <div class="card-status-top bg-cyan"></div>
+                                    <div class="card-body">
+                                        <a class="card-title" href="@($"/Blog/{blog.Id}")">@blog.Title</a>
+                                        <h5>@blog.AuthorName</h5>
+                                        <p>@blog.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                                    </div>
+                                </div>
+                            </CardTemplate>
+                        </CustomCarousel>
+                    }
+                }
+                @if (_isBlogDraftsLoaded)
+                {
+                    @if (_myLast12BlogDrafts.Count == 0)
+                    {
+                        <div class="mt-2 mb-4">
+                            <h2>Your Saved Blog Drafts</h2>
+                            <div class="card">
+                                <div class="empty">
+                                    <div class="empty-title">No Blog Drafts!</div>
+                                    <div class="empty-subtitle text-muted">Having an idea? Add it inside a draft!</div>
+                                    <div class="empty-actions">
+                                        <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs/New"))">
+                                            Click to add one
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <CustomCarousel Id="sample4" Items="_myLast12BlogDrafts" Title="Your Saved Drafts">
+                            <CardTemplate Context="blogDraft">
+                                <div class="card h-100">
+                                    <div class="card-status-top bg-cyan"></div>
+                                    <div class="card-body">
+                                        <a class="card-title" href="@($"/Personal/Drafts/{blogDraft.Id}")">
+                                            @blogDraft.Title
+                                        </a>
+                                        <h5>@blogDraft.AuthorName</h5>
+                                        <p>Last worked on @blogDraft.SaveDateTime.ToString("MMMM dd, yyyy")</p>
+                                    </div>
+                                </div>
+                            </CardTemplate>
+                        </CustomCarousel>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</AuthorizeView>
