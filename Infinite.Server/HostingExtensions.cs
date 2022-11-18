@@ -4,7 +4,6 @@ using Infinite.Core.Interfaces.Features;
 using Infinite.Core.Interfaces.Repositories;
 using Infinite.Core.Persistence;
 using Infinite.Core.Repositories;
-using Infinite.Server.Endpoints;
 using Infinite.Server.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

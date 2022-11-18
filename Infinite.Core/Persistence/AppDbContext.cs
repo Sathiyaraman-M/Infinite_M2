@@ -25,4 +25,5 @@ public class AppDbContext : ApiAuthorizationDbContext<AppUser>
     public DbSet<ProjectBookmark> UserProjectBookmarks { get; set; }
     public DbSet<BlogLike> UserBlogLikes { get; set; }
     public DbSet<ProjectLike> UserProjectLikes { get; set; }
+    public DbSet<UserFollow> UserFollows { get; set; }
 }
