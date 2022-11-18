@@ -1,0 +1,114 @@
+﻿@page "/Explore"
+@using Sve.Blazor.InfiniteScroll.Components
+<PageTitle>Explore Infinite | Novel Infinite</PageTitle>
+<div class="page-wrapper"> 
+    <div class="page-header">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col">
+                    <div class="page-title">Explore</div>
+                    <div class="page-pretitle">Find what the outside world is doing!</div>
+                </div>
+                <div class="col-auto">
+                    <button class="btn">
+                        <BSIcon Icon="@TablerIcons.Refresh" Color="Color.Dark" />
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="row g-2">
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-7">
+                    <div class="d-flex flex-column">
+                        <div style="overflow-y: scroll; height: 82vh; overflow-x: hidden">
+                            <InfiniteScroll ObserverTargetId="obs-target" ObservableTargetReached="OnObservedTargetReached">
+                                @foreach (var i in _integers)
+                                {
+                                    <div class="card mb-3 mx-2" style="height: 350px">
+                                        <div class="card-header">
+                                            <div class="card-title">
+                                                This is a post #@i
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <h4>This is card in explore page</h4>
+                                        </div>
+                                    </div>
+                                }
+                                <div id="obs-target">
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar progress-bar-indeterminate"></div>
+                                    </div>
+                                </div>
+                            </InfiniteScroll>
+                        </div>
+                    </div>
+                    @* <InfiniteScroll ItemsProvider="GetItems"> *@
+                    @*     <ItemTemplate Context="item"> *@
+                    @*         <p>Item @item</p> *@
+                    @*     </ItemTemplate> *@
+                    @*     <LoadingTemplate> *@
+                    @*         <div>Loading...</div> *@
+                    @*     </LoadingTemplate> *@
+                    @* </InfiniteScroll> *@
+                    @* <div class="d-flex flex-column"> *@
+                    @*     <div style="overflow-y: scroll; height: 82vh; overflow-x: hidden"> *@
+                    @*         <div class="row text-center"> *@
+                    @*             @for (var i = 0; i < 33; i++) *@
+                    @*             { *@
+                    @*                 <div class="col-12"> *@
+                    @*                     <div class="card mb-3 mx-2" style="height: 350px"> *@
+                    @*                         <div class="card-header"> *@
+                    @*                             <div class="card-title"> *@
+                    @*                                 This is a post #@i *@
+                    @*                             </div> *@
+                    @*                         </div> *@
+                    @*                         <div class="card-body"> *@
+                    @*                             <h4>This is card in explore page</h4> *@
+                    @*                         </div> *@
+                    @*                     </div> *@
+                    @*                 </div> *@
+                    @*             } *@
+                    @*         </div> *@
+                    @*     </div> *@
+                    @* </div> *@
+                </div>
+                <div class="col-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Advertisement</div>
+                        </div>
+                        <div class="card-body">
+                            This can be a good spot for placing advertisement
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private readonly List<int> _integers = Enumerable.Range(1, 50).ToList();
+
+    private void OnObservedTargetReached()
+    {
+        _integers.AddRange(Enumerable.Range(_integers.Count, _integers.Count + 50));
+    }
+
+}
