@@ -1,0 +1,51 @@
+﻿@typeparam T
+
+<div class="d-flex flex-row-reverse gap-2">
+    @if (Items.Count > VisibleSlideCount)
+    {
+        <a class="btn btn-icon" href="@($"#{Id}")">
+            <BSIcon Icon="@TablerIcons.Arrow_right"  data-bs-slide="next"/>
+        </a>
+        <a class="btn btn-icon" href="@($"#{Id}")">
+            <BSIcon Icon="@TablerIcons.Arrow_left"  data-bs-slide="prev"/>
+        </a>
+    }
+    <div class="me-auto">
+        <h2>@Title</h2>
+    </div>
+</div>
+<div id="@Id" class="carousel slide mt-2 mb-4" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        @for (var i = 0; i < Items.Count; i += VisibleSlideCount)
+        {
+            <div class="carousel-item @(i == 0 ? "active" : "") w-100">
+                <div class="d-flex">
+                    @for (var j = i; j < i + VisibleSlideCount && j < Items.Count; j++)
+                {
+                    <div class="d-block w-25 @(i == j ? "" : "ms-2")">
+                        @CardTemplate(Items[j])
+                    </div>
+                }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code 
+{
+    [Parameter]
+    public string Id { get; set; }
+    
+    [Parameter]
+    public string Title { get; set; }
+    
+    [Parameter]
+    public RenderFragment<T> CardTemplate { get; set; }
+
+    [Parameter]
+    public int VisibleSlideCount { get; set; } = 4;
+    
+    [Parameter]
+    public IReadOnlyList<T> Items { get; set; }
+}
