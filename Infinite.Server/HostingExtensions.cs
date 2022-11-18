@@ -95,5 +95,6 @@ public static class HostingExtensions
         services.AddTransient<IUserBookmarkService, UserBookmarkService>();
         services.AddTransient<IProjectService, ProjectService>();
         services.AddTransient<IUserLikesService, UserLikesService>();
+        services.AddTransient<IUserFollowService, UserFollowService>();
     }
 }

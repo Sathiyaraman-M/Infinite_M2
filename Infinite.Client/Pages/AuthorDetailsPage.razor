@@ -1,6 +1,7 @@
 ﻿@page "/{Id:guid}"
 @inject BlogHttpClient BlogHttpClient
 @inject ManageAccountHttpClient ManageAccountHttpClient
+@inject UserFollowHttpClient UserFollowHttpClient
 
 @if (_isMdLoaded && _authorPublicInfo != null && _isBlogsLoaded)
 {
@@ -14,15 +15,43 @@
                             <span class="avatar rounded-circle" style="background: url('https://avatar.tobi.sh/')"></span>
                             <div class="d-flex flex-column">
                                 <div class="page-title text-uppercase ms-2">@_authorPublicInfo.Name</div>
-                                <div class="page-pretitle ms-2">#@_authorPublicInfo.FullName</div>
+                                <div class="page-subtitle ms-2">
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            @_authorPublicInfo.FullName
+                                        </div>
+                                        @if (_followStat != null)
+                                        {
+                                            <div class="col-auto">
+                                                <span class="text-reset">@_followStat.Followers Followers and @_followStat.Followed Following</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-auto">
-                        <button class="btn" @onclick="@InvokeShareDialog">
-                            <BSIcon Icon="@TablerIcons.Share" Color="Color.Dark" />
-                            Share
-                        </button>
+                        <div class="btn-list">
+                            @if (_isFollowed)
+                            {
+                                <button class="btn btn-blue" @onclick="@ToggleFollow">
+                                    <BSIcon Icon="@TablerIcons.Circle_check"/>
+                                    Followed
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn" @onclick="@ToggleFollow">
+                                    <BSIcon Icon="@TablerIcons.Plus" Color="Color.Dark" />
+                                    Follow
+                                </button>
+                            }
+                            <button class="btn" @onclick="@InvokeShareDialog">
+                                <BSIcon Icon="@TablerIcons.Share" Color="Color.Dark"/>
+                                Share
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,6 @@ using System.Security.Claims;
 using BlazorSlice.Dialog;
 using BlazorSlice.Dialog.Services;
 using Infinite.Base.Responses;
-using Infinite.Client.Extensions;
 using Infinite.Client.Shared.Dialogs;
 using Markdig;
 using Size = BlazorSlice.Dialog.Size;
@@ -14,10 +13,12 @@ public partial class Personal
 {
     private string _userPortFolioMd;
     private List<MinifiedProjectResponse> _myLast4Projects = new();
+    private List<AuthorPublicInfoResponse> _myFollowedDetails = new();
     private List<MinifiedBlogResponse> _myLast4Blogs = new();
     private List<MinifiedBlogDraftResponse> _myLast4BlogDrafts = new();
     private bool _isMdLoaded;
     private bool _isProjectsLoaded;
+    private bool _isFollowedLoaded;
     private bool _isBlogsLoaded;
     private bool _isBlogDraftsLoaded;
 
@@ -30,11 +31,13 @@ public partial class Personal
     {
         await LoadPortfolio();
         await LoadProjects();
+        await LoadFollowedDetails();
         await LoadLatestBlogs();
         await LoadLatestBlogDrafts();
         await base.OnInitializedAsync();
         _isMdLoaded = true;
         _isProjectsLoaded = true;
+        _isFollowedLoaded = true;
         _isBlogsLoaded = true;
         _isBlogDraftsLoaded = true;
     }
@@ -55,9 +58,25 @@ public partial class Personal
         }
     }
 
+    private async Task LoadFollowedDetails()
+    {
+        var result = await UserFollowHttpClient.GetAllFollowedDetails();
+        if (result.Succeeded)
+        {
+            _myFollowedDetails = result.Data;
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+
     private async Task LoadProjects()
     {
-        var projectsResult = await HttpClient.GetFromJsonAsync<Result<List<MinifiedProjectResponse>>>("api/projects/recent");
+        var projectsResult = await ProjectHttpClient.GetRecentNProjects();
         if (projectsResult!.Succeeded)
         {
             _myLast4Projects = projectsResult.Data;
@@ -109,8 +128,7 @@ public partial class Personal
         if (await DialogService.ShowMessageBox("Confirm Delete",
                 "Are you sure want to delete this project? This action cannot be undone", "Yes", "No", options:options) == true)
         {
-            var response = await HttpClient.DeleteAsync($"api/projects/{id}");
-            var result = await response.ToResult();
+            var result = await ProjectHttpClient.DeleteProject(id);
             if (result!.Succeeded)
             {
                 Toast.Add("Success", result.Messages[0], Severity.Success);

@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using BlazorSlice.Dialog;
 using BlazorSlice.Dialog.Services;
 using Infinite.Client.Shared.Dialogs;
@@ -19,6 +18,8 @@ public partial class AuthorDetailsPage
     private List<MinifiedBlogResponse> _latest4Blogs = new();
     private bool _isMdLoaded;
     private bool _isBlogsLoaded;
+    private FollowStatResponse _followStat;
+    private bool _isFollowed;
 
     private static MarkdownPipeline Pipeline => new MarkdownPipelineBuilder()
         .UseAdvancedExtensions()
@@ -27,12 +28,58 @@ public partial class AuthorDetailsPage
 
     protected override async Task OnParametersSetAsync()
     {
+        await GetFollowStat();
         await LoadPortfolio();
         await LoadAuthorPublicDetails();
         await LoadLatestBlogs();
         await base.OnParametersSetAsync();
         _isMdLoaded = true;
         _isBlogsLoaded = true;
+    }
+
+    private async Task GetFollowStat()
+    {
+        var result = await UserFollowHttpClient.GetFollowStat(Id.ToString());
+        if (result.Succeeded)
+        {
+            _followStat = result.Data;
+            var isFollowedResult = await UserFollowHttpClient.IsUserFollowed(Id.ToString());
+            if (isFollowedResult.Succeeded)
+            {
+                _isFollowed = isFollowedResult.Data;
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    Toast.Add("Error", message, Severity.Error);
+                }
+            }
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
+    }
+
+    private async Task ToggleFollow()
+    {
+        var result = await UserFollowHttpClient.ToggleUserFollow(Id.ToString());
+        if (result.Succeeded)
+        {
+            _isFollowed = result.Data;
+            await GetFollowStat();
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                Toast.Add("Error", message, Severity.Error);
+            }
+        }
     }
 
     private async Task LoadPortfolio()

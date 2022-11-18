@@ -162,6 +162,7 @@ public class ManageAccountService : IManageAccountService
             }
             var response = new AuthorPublicInfoResponse()
             {
+                Id = userProfileInfo.UserId,
                 AboutMe = userProfileInfo.AboutMe,
                 Country = userProfileInfo.Country,
                 FullName = userProfileInfo.FullName,

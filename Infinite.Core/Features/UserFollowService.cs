@@ -33,6 +33,31 @@ public class UserFollowService : IUserFollowService
         }
     }
 
+    public async Task<IResult<List<AuthorPublicInfoResponse>>> GetAllFollowedPeopleDetails(string userId)
+    {
+        try
+        {
+            var followed = await _unitOfWork.GetRepository<UserFollow>().Entities
+                .Include(x => x.Followed)
+                .Include(x => x.FollowedProfileInfo)
+                .Where(x => x.FollowerId == userId)
+                .Select(x => new AuthorPublicInfoResponse()
+                {
+                    AboutMe = x.FollowedProfileInfo.AboutMe,
+                    Country = x.FollowedProfileInfo.Country,
+                    FullName = x.FollowedProfileInfo.FullName,
+                    Name = x.Followed.UserName,
+                    Status = x.FollowedProfileInfo.Status
+                })
+                .ToListAsync();
+            return await Result<List<AuthorPublicInfoResponse>>.SuccessAsync(followed);
+        }
+        catch (Exception e)
+        {
+            return await Result<List<AuthorPublicInfoResponse>>.FailAsync(e.Message);
+        }
+    }
+
     public async Task<PaginatedResult<AuthorPublicInfoResponse>> GetFollowersDetails(int pageNumber, int pageSize, string searchString, string userId)
     {
         try
@@ -40,9 +65,10 @@ public class UserFollowService : IUserFollowService
             return await _unitOfWork.GetRepository<UserFollow>().Entities
                 .Include(x => x.Follower)
                 .Include(x => x.FollowerProfileInfo)
-                .Where(x => x.FollowerId == userId)
+                .Where(x => x.FollowedId == userId)
                 .Select(x => new AuthorPublicInfoResponse()
                 {
+                    Id = x.FollowerProfileInfo.UserId,
                     AboutMe = x.FollowerProfileInfo.AboutMe,
                     Country = x.FollowerProfileInfo.Country,
                     FullName = x.FollowerProfileInfo.FullName,
@@ -57,13 +83,102 @@ public class UserFollowService : IUserFollowService
         }
     }
 
+    public async Task<IResult<List<AuthorPublicInfoResponse>>> GetAllFollowersDetails(string userId)
+    {
+        try
+        {
+            var followed = await _unitOfWork.GetRepository<UserFollow>().Entities
+                .Include(x => x.Follower)
+                .Include(x => x.FollowerProfileInfo)
+                .Where(x => x.FollowedId == userId)
+                .Select(x => new AuthorPublicInfoResponse()
+                {
+                    Id = x.FollowerProfileInfo.UserId,
+                    AboutMe = x.FollowerProfileInfo.AboutMe,
+                    Country = x.FollowerProfileInfo.Country,
+                    FullName = x.FollowerProfileInfo.FullName,
+                    Name = x.Follower.UserName,
+                    Status = x.FollowerProfileInfo.Status
+                })
+                .ToListAsync();
+            return await Result<List<AuthorPublicInfoResponse>>.SuccessAsync(followed);
+        }
+        catch (Exception e)
+        {
+            return await Result<List<AuthorPublicInfoResponse>>.FailAsync(e.Message);
+        }
+    }
+
+    public async Task<IResult<bool>> IsUserFollowed(string userId, string authorId)
+    {
+        try
+        {
+            var userFollow = await _unitOfWork.GetRepository<UserFollow>().Entities
+                .FirstOrDefaultAsync(x => x.FollowedId == authorId && x.FollowerId == userId);
+            return await Result<bool>.SuccessAsync(userFollow != null);
+        }
+        catch (Exception e)
+        {
+            return await Result<bool>.FailAsync(e.Message);
+        }
+    }
+
     public async Task<IResult<bool>> ToggleUserFollow(string userId, string followedId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            if (userId == followedId)
+                throw new Exception("One cannot follow himself/herself");
+            var userFollow = await _unitOfWork.GetRepository<UserFollow>().Entities
+                .Where(x => x.FollowedId == followedId && x.FollowerId == userId)
+                .FirstOrDefaultAsync();
+            if (userFollow == null)
+            {
+                var followerProfile = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+                    .FirstAsync(x => x.UserId == userId);
+                var followedProfile = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+                    .FirstAsync(x => x.UserId == followedId);
+                userFollow = new UserFollow()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    FollowedId = followedId,
+                    FollowedProfileInfoId = followedProfile.Id,
+                    FollowerId = userId,
+                    FollowerProfileInfoId = followerProfile.Id,
+                };
+                await _unitOfWork.GetRepository<UserFollow>().AddAsync(userFollow);
+            }
+            else
+            {
+                await _unitOfWork.GetRepository<UserFollow>().DeleteAsync(userFollow);
+            }
+            await _unitOfWork.Commit();
+            return await Result<bool>.SuccessAsync(userFollow == null);
+        }
+        catch (Exception e)
+        {
+            return await Result<bool>.FailAsync(e.Message);
+        }
     }
 
     public async Task<IResult<FollowStatResponse>> GetFollowStatResponse(string userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var userProfileInfo = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+                .Include(x => x.User)
+                .FirstAsync(x => x.UserId == userId);
+            var followed = await _unitOfWork.GetRepository<UserFollow>().Entities
+                .CountAsync(x => x.FollowerId == userId);
+            var followers = await _unitOfWork.GetRepository<UserFollow>().Entities
+                .CountAsync(x => x.FollowedId == userId);
+            var response = new FollowStatResponse(userId, userProfileInfo.User.UserName, userProfileInfo.FullName,
+                followers, followed);
+            return await Result<FollowStatResponse>.SuccessAsync(response);
+        }
+        catch (Exception e)
+        {
+            return await Result<FollowStatResponse>.FailAsync(e.Message);
+        }
     }
 }
