@@ -138,7 +138,7 @@ public class UserFollowService : IUserFollowService
                     .FirstAsync(x => x.UserId == userId);
                 var followedProfile = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
                     .FirstAsync(x => x.UserId == followedId);
-                userFollow = new UserFollow()
+                var newUserFollow = new UserFollow()
                 {
                     Id = Guid.NewGuid().ToString(),
                     FollowedId = followedId,
@@ -146,7 +146,7 @@ public class UserFollowService : IUserFollowService
                     FollowerId = userId,
                     FollowerProfileInfoId = followerProfile.Id,
                 };
-                await _unitOfWork.GetRepository<UserFollow>().AddAsync(userFollow);
+                await _unitOfWork.GetRepository<UserFollow>().AddAsync(newUserFollow);
             }
             else
             {

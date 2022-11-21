@@ -1,5 +1,4 @@
 ﻿@page "/Blog/{Id:guid}"
-@using Markdig
 @using Infinite.Base.Enums
 @attribute [AllowAnonymous]
 @inject UserBookmarkHttpClient UserBookmarkHttpClient
@@ -13,8 +12,8 @@
             <div class="container-xl">
                 <div class="row">
                     <div class="col">
-                        <div class="h1">@Blog.Title</div>
-                        <div class="page-pretitle">
+                        <div class="page-title">@Blog.Title</div>
+                        <div class="page-subtitle">
                             @switch (Blog.Visibility)
                             {
                                 case Visibility.Private:
@@ -41,13 +40,13 @@
                             </button>
                             @if (IsBookmarked)
                             {
-                                <button class="btn btn-icon btn-yellow" @onclick="@(() => ToggleBookmark(false))">
+                                <button class="btn btn-icon btn-yellow" @onclick="@ToggleBookmark">
                                     <BSIcon Icon="@TablerIcons.Bookmark" Class="icon-filled" />
                                 </button>
                             }
                             else
                             {
-                                <button class="btn btn-icon" @onclick="@(() => ToggleBookmark(true))">
+                                <button class="btn btn-icon" @onclick="@ToggleBookmark">
                                     <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark" />
                                 </button>
                             }
@@ -171,7 +170,7 @@ else
         await base.OnParametersSetAsync();
     }
 
-    private async Task ToggleBookmark(bool toggled)
+    private async Task ToggleBookmark()
     {
         if (IsAuthenticated)
         {
