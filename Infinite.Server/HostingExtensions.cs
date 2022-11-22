@@ -1,4 +1,6 @@
-﻿using Infinite.Base.Entities;
+﻿using Hangfire;
+using Hangfire.Storage.SQLite;
+using Infinite.Base.Entities;
 using Infinite.Core.Features;
 using Infinite.Core.Interfaces.Features;
 using Infinite.Core.Interfaces.Repositories;
@@ -34,6 +36,8 @@ public static class HostingExtensions
         builder.Services.AddAuthorization();
         builder.Services.ConfigureInternalServices();
         builder.Services.ConfigureFeatures();
+        builder.Services.AddHangfire(x => x.UseSQLiteStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddHangfireServer();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
         builder.Services.AddEndpointsApiExplorer();
@@ -69,6 +73,7 @@ public static class HostingExtensions
 
         app.MapRazorPages();
         app.MapControllers();
+        app.MapHangfireDashboard();
         app.MapFallbackToFile("index.html");
 
         app.UseSwagger();
@@ -96,5 +101,6 @@ public static class HostingExtensions
         services.AddTransient<IProjectService, ProjectService>();
         services.AddTransient<IUserLikesService, UserLikesService>();
         services.AddTransient<IUserFollowService, UserFollowService>();
+        services.AddTransient<ISubscriptionService, SubscriptionService>();
     }
 }

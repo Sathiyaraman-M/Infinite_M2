@@ -60,9 +60,59 @@
                                     <option value="@Visibility.Unlisted">Unlisted</option>
                                 </InputSelect>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6 col-lg-3 mb-2">
+                                <label class="form-label">Complexity</label>
+                                <InputSelect @bind-Value="@Model.Complexity" class="form-select">
+                                    <option>@ProjectComplexity.Easy</option>
+                                    <option>@ProjectComplexity.Medium</option>
+                                    <option>@ProjectComplexity.Difficult</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-3 mb-2">
+                                <label class="form-label">Project Type</label>
+                                <InputSelect @bind-Value="@Model.Type" class="form-select">
+                                    <option>@ProjectType.Personal</option>
+                                    <option>@ProjectType.Professional</option>
+                                    <option>@ProjectType.Research</option>
+                                    <option>@ProjectType.Undisclosed</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-3 mb-2">
+                                <label class="form-label">Capital Source</label>
+                                <InputSelect @bind-Value="@Model.CapitalSourceType" class="form-select">
+                                    <option>@ProjectCapitalSourceType.Personal</option>
+                                    <option>@ProjectCapitalSourceType.Public</option>
+                                    <option>@ProjectCapitalSourceType.Private</option>
+                                    <option>@ProjectCapitalSourceType.Mixed</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-3 mb-2">
+                                <label class="form-label">Objective</label>
+                                <InputSelect @bind-Value="@Model.Objective" class="form-select">
+                                    <option>@ProjectObjective.Production</option>
+                                    <option>@ProjectObjective.Social</option>
+                                    <option>@ProjectObjective.Educational</option>
+                                    <option>@ProjectObjective.Community</option>
+                                    <option>@ProjectObjective.Research</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-12 mb-2">
                                 <label class="form-label">Description</label>
                                 <InputTextArea @bind-Value="@Model.Description" class="form-control"></InputTextArea>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <label class="form-label">Elaborate Objectives</label>
+                                <InputTextArea @bind-Value="@Model.ElaborateObjectives" class="form-control"></InputTextArea>
+                                <div class="form-text">Markdown supported</div>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <label class="form-label">Requirements</label>
+                                <InputTextArea @bind-Value="@Model.Requirements" class="form-control"></InputTextArea>
+                                <div class="form-text">Markdown supported</div>
                             </div>
                         </div>
                         <div class="row row-deck">

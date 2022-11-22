@@ -40,6 +40,7 @@ public static class HostingExtensions
         services.AddTransient<UserBookmarkHttpClient>();
         services.AddTransient<UserLikeHttpClient>();
         services.AddTransient<UserFollowHttpClient>();
+        services.AddTransient<SubscriptionHttpClient>();
     }
 
     public static WebAssemblyHost InvokeStartupServices(this WebAssemblyHost host)

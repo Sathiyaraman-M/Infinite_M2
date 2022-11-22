@@ -61,10 +61,26 @@
             <div class="container-xl">
                 <div class="card mb-2">
                     <div class="card-header">
-                        <div class="card-title">Descrption</div>
+                        <div class="card-title">Description</div>
                     </div>
                     <div class="card-body">
                         @Project.Description
+                    </div>
+                </div>
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <div class="card-title">Elaborate Objectives</div>
+                    </div>
+                    <div class="card-body">
+                        @(new MarkupString(Markdown.ToHtml(Project.ElaborationObjectives)))
+                    </div>
+                </div>
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <div class="card-title">Requirements</div>
+                    </div>
+                    <div class="card-body">
+                        @(new MarkupString(Markdown.ToHtml(Project.Requirements)))
                     </div>
                 </div>
                 <div class="card mb-2">

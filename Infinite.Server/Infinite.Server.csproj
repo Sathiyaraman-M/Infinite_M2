@@ -16,6 +16,8 @@
 
     <ItemGroup>
         <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
+        <PackageReference Include="Hangfire" Version="1.7.32" />
+        <PackageReference Include="Hangfire.Storage.SQLite" Version="0.3.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.0" />

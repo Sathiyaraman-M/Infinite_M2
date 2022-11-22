@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Hangfire;
 using Infinite.Base.Entities;
 using Infinite.Base.Enums;
 using Infinite.Core.Interfaces.Repositories;

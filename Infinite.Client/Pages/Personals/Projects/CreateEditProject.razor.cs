@@ -35,12 +35,18 @@ public partial class CreateEditProject
                     Authors = response.Authors,
                     CreatedDate = response.CreatedDate,
                     Description = response.Description,
+                    ElaborateObjectives = response.ElaborationObjectives,
+                    Requirements = response.Requirements,
                     Id = response.Id,
                     LastEditedDate = response.LastEditedDate,
                     Tags = response.Tags,
                     TeamProject = response.TeamProject,
                     Title = response.Title,
-                    Visibility = response.Visibility
+                    Visibility = response.Visibility,
+                    Type = response.Type,
+                    Objective = response.Objective,
+                    CapitalSourceType = response.CapitalSourceType,
+                    Complexity = response.Complexity,
                 };
             }
             else

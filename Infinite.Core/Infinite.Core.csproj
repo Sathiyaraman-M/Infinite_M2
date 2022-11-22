@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentEmail.Smtp" Version="3.0.2" />
+        <PackageReference Include="Hangfire.Core" Version="1.7.32" />
         <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="7.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.0" />

@@ -6,6 +6,10 @@ public record FullProjectResponse
     
     public string Title { get; init; }
     public string Description { get; init; }
+    
+    public string ElaborationObjectives { get; set; }
+    
+    public string Requirements { get; set; }
     public string Tags { get; init; }
     public bool TeamProject { get; init; }
     public List<ProjectAuthorResponse> Authors { get; init; } = new();
@@ -16,6 +20,14 @@ public record FullProjectResponse
     public DateTime StartDate { get; init; }
     public DateTime? EndDate { get; init; }
     public bool Ongoing { get; init; }
+    
+    public ProjectComplexity Complexity { get; set; }
+    
+    public ProjectCapitalSourceType CapitalSourceType { get; set; }
+    
+    public ProjectObjective Objective { get; set; }
+    
+    public ProjectType Type { get; set; }
     
     public string Abstract { get; init; }
 

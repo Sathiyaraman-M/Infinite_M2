@@ -67,11 +67,17 @@ public class ProjectService : IProjectService
                     Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
+                    ElaborationObjectives = x.ElaborationObjectives,
+                    Requirements = x.Requirements,
                     Abstract = x.Abstract,
                     TeamProject = x.TeamProject,
                     Tags = x.Tags,
                     Authors = x.UserProjects.Select(y => new ProjectAuthorResponse(y.UserId, y.User.UserName)).ToList(),
                     Visibility = x.Visibility,
+                    Type = x.Type,
+                    Objective = x.Objective,
+                    CapitalSourceType = x.CapitalSourceType,
+                    Complexity = x.Complexity,
                     CreatedDate = x.CreatedDate,
                     LastEditedDate = x.LastEditedDate,
                     StartDate = x.StartDate,
@@ -214,6 +220,8 @@ public class ProjectService : IProjectService
                     Id = id.ToString(),
                     Abstract = request.Abstract,
                     CreatedDate = DateTime.Now,
+                    ElaborationObjectives = request.ElaborateObjectives,
+                    Requirements = request.Requirements,
                     Description = request.Description,
                     LastEditedDate = request.LastEditedDate,
                     Tags = request.Tags,
@@ -222,7 +230,11 @@ public class ProjectService : IProjectService
                     Visibility = request.Visibility,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
-                    Ongoing = request.Ongoing
+                    Ongoing = request.Ongoing,
+                    Type = request.Type,
+                    Objective = request.Objective,
+                    CapitalSourceType = request.CapitalSourceType,
+                    Complexity = request.Complexity,
                 };
 
                 //Add the authors to the project object 
@@ -257,6 +269,8 @@ public class ProjectService : IProjectService
             existingProject.Abstract = request.Abstract;
             existingProject.LastEditedDate = DateTime.Now;
             existingProject.Description = request.Description;
+            existingProject.ElaborationObjectives = request.ElaborateObjectives;
+            existingProject.Requirements = request.Requirements;
             existingProject.Tags = request.Tags;
             existingProject.Title = request.Title;
             existingProject.TeamProject = request.TeamProject;
@@ -264,6 +278,10 @@ public class ProjectService : IProjectService
             existingProject.StartDate = request.StartDate;
             existingProject.EndDate = request.EndDate;
             existingProject.Ongoing = request.Ongoing;
+            existingProject.Type = request.Type;
+            existingProject.Objective = request.Objective;
+            existingProject.CapitalSourceType = request.CapitalSourceType;
+            existingProject.Complexity = request.Complexity;
 
             //Remove all author objects
             foreach (var author in existingProject.UserProjects)
