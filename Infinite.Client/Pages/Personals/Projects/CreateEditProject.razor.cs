@@ -23,7 +23,7 @@ public partial class CreateEditProject
 
     private void OnChangeFiles(InputFileChangeEventArgs args)
     {
-        _browserFiles = args.GetMultipleFiles();
+        _browserFiles = args.FileCount == 1 ? new IBrowserFile[] { args.File } : args.GetMultipleFiles();
     }
 
     private async Task AddSelectedFiles()
@@ -33,17 +33,24 @@ public partial class CreateEditProject
             foreach (var file in _browserFiles)
             {
                 var extension = Path.GetExtension(file.Name);
-                var fileName = $"{Guid.NewGuid().ToString()}.{extension}";
+                var fileName = $"{file.Name}";
                 var data = new byte[file.Size];
                 var result = await file.OpenReadStream().ReadAsync(data);
+                Toast.Add("Info", "File Added Successfully", Severity.Info);
                 Model.Uploads.Add(new UploadRequest()
                 {
                     Data = data,
-                    FileName = fileName,
+                    FileName = $"{file.Name}",
                     Extension = extension,
                     UploadType = UploadType.Project
                 });
             }
+            _browserFiles = null;
+            StateHasChanged();
+        }
+        else
+        {
+            Toast.Add("Empty", "No Files Added");
         }
     }
 

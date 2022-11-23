@@ -192,10 +192,10 @@
                             <label for="formFile" class="form-label"></label>
                             <div class="row">
                                 <div class="col">
-                                    <InputFile id="formFile" class="form-control" OnChange="@OnChangeFiles" />
+                                    <InputFile multiple id="formFile" class="form-control" OnChange="@OnChangeFiles" />
                                 </div>
                                 <div class="col-auto">
-                                    <button type="button" class="btn btn-primary">Add selected files</button>
+                                    <button type="button" class="btn btn-primary" @onclick="AddSelectedFiles">Add selected files</button>
                                 </div>
                             </div>
                         </div>
@@ -205,6 +205,7 @@
                                 <tr>
                                     <th>S.No</th>
                                     <th>Name</th>
+                                    <th>Size</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
@@ -213,9 +214,10 @@
                                 {
                                     <tr>
                                         <td>1</td>
-                                        <td>Img1.png</td>
+                                        <td>@upload.FileName</td>
+                                        <td>@upload.Data.Length</td>
                                         <td>
-                                            <button type="button" class="btn">
+                                            <button type="button" class="btn" @onclick="@(() => Model.Uploads.Remove(upload))">
                                                 <BSIcon Icon="@TablerIcons.X" Color="Color.Dark"/>
                                                 Remove
                                             </button>
