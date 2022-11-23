@@ -18,10 +18,6 @@ public static class HostingExtensions
     public static WebAssemblyHostBuilder ConfigureServices(this WebAssemblyHostBuilder builder)
     {
         builder.Services.ConfigureHttpClients(builder.HostEnvironment.BaseAddress);
-        // builder.Services.AddOidcAuthentication(options =>
-        // {
-        //     builder.Configuration.Bind("Local", options.ProviderOptions);
-        // });
         builder.Services.AddApiAuthorization();
         builder.Services.AddBlazorSliceToast();
         builder.Services.AddBlazorSliceDialog();

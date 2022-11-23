@@ -4,8 +4,10 @@ using Infinite.Base.Entities;
 using Infinite.Core.Features;
 using Infinite.Core.Interfaces.Features;
 using Infinite.Core.Interfaces.Repositories;
+using Infinite.Core.Interfaces.Services;
 using Infinite.Core.Persistence;
 using Infinite.Core.Repositories;
+using Infinite.Core.Services;
 using Infinite.Server.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -91,6 +93,7 @@ public static class HostingExtensions
     {
         services.AddTransient<IUnitOfWork, UnitOfWork>();
         services.AddTransient(typeof(IRepositoryAsync<>), typeof(RepositoryAsync<>));
+        services.AddTransient<IUploadService, UploadService>();
     }
 
     private static void ConfigureFeatures(this IServiceCollection services)

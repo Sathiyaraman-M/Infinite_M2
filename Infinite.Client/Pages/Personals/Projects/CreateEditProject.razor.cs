@@ -1,9 +1,11 @@
 ﻿using System.Security.Claims;
 using BlazorSlice.Dialog;
 using BlazorSlice.Dialog.Services;
+using Infinite.Base.Enums;
 using Infinite.Base.Requests;
 using Infinite.Base.Responses;
 using Infinite.Client.Shared.Dialogs;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Infinite.Client.Pages.Personals.Projects;
 
@@ -16,6 +18,34 @@ public partial class CreateEditProject
     [Parameter] public Guid? Id { get; set; }
 
     private EditProjectRequest Model { get; set; } = new();
+
+    private IEnumerable<IBrowserFile> _browserFiles;
+
+    private void OnChangeFiles(InputFileChangeEventArgs args)
+    {
+        _browserFiles = args.GetMultipleFiles();
+    }
+
+    private async Task AddSelectedFiles()
+    {
+        if (_browserFiles != null && _browserFiles.Count() != 0)
+        {
+            foreach (var file in _browserFiles)
+            {
+                var extension = Path.GetExtension(file.Name);
+                var fileName = $"{Guid.NewGuid().ToString()}.{extension}";
+                var data = new byte[file.Size];
+                var result = await file.OpenReadStream().ReadAsync(data);
+                Model.Uploads.Add(new UploadRequest()
+                {
+                    Data = data,
+                    FileName = fileName,
+                    Extension = extension,
+                    UploadType = UploadType.Project
+                });
+            }
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {

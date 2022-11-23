@@ -28,4 +28,6 @@ public class EditProjectRequest
     public Visibility Visibility { get; set; }
     
     public string Abstract { get; set; }
+
+    public List<UploadRequest> Uploads { get; set; } = new();
 }

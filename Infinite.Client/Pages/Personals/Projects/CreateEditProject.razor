@@ -187,6 +187,44 @@
                                 <InputTextArea @bind-Value="@Model.Abstract" class="form-control"></InputTextArea>
                             </div>
                         </div>
+                        <h3 class="mt-4">Project Images</h3>
+                        <div class="mb-2">
+                            <label for="formFile" class="form-label"></label>
+                            <div class="row">
+                                <div class="col">
+                                    <InputFile id="formFile" class="form-control" OnChange="@OnChangeFiles" />
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary">Add selected files</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mb-2">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var upload in Model.Uploads)
+                                {
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Img1.png</td>
+                                        <td>
+                                            <button type="button" class="btn">
+                                                <BSIcon Icon="@TablerIcons.X" Color="Color.Dark"/>
+                                                Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>                    
                 </div>
             </div>
