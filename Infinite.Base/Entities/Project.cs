@@ -10,7 +10,7 @@ public class Project : IEntity<string>
     
     public string ElaborationObjectives { get; set; }
     
-    public string Requirements { get; set; }
+    public string Requirements { get; set; } 
     
     public string Tags { get; set; }
     public bool TeamProject { get; set; }

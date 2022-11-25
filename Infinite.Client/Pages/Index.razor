@@ -4,17 +4,58 @@
 <div class="page-wrapper">
     <div class="page-body">
         <div class="container-xl">
-            <h1>Hello, world!</h1>
-            <button type="button" class="btn btn-primary" @onclick="OpenToast">Click me!</button>
+            <div class="card p-3 mb-2">
+                <div class="card-body">
+                    <h2 class="display-4">Welcome to Novel Infinite</h2>
+                    <h3 class="my-2">A Brand-new Platform to share and learn from projects</h3>
+                    <a class="btn btn-cyan" href="authentication/login">
+                        Get Inside &#62;&#62;
+                    </a>
+                </div>
+            </div>
+            <div class="card mb-2">
+                <img class="card-img" src="img1.jpg" alt="img1" style="height: 300px;" />
+                <div class="card-img-overlay" style="padding: 35px; justify-content: flex-start">
+                    <h3 class="display-5 fw-bold">Share your projects</h3>
+                    <h3>This is an open platform where you can share all your projects to the world, with you choosing the level of your project confidentiality</h3>
+                </div>
+            </div>
+            <div class="card text-end mb-2">
+                <img class="card-img" src="img3.jpg" alt="img3" style="height: 300px" />
+                <div class="card-img-overlay" style="padding: 35px; justify-content: flex-start">
+                    <h3 class="display-5 fw-bold">Write blogs to explain your projects</h3>
+                    <h3>You can write blogs to effectively explain the workings of your projects.</h3>
+                </div>
+            </div>
+            <div class="card mb-2">
+                <img class="card-img" src="img2.jpg" alt="img2" style="height: 300px" />
+                <div class="card-img-overlay" style="padding: 35px; justify-content: flex-start">
+                    <h3 class="display-5 fw-bold">Learn from other's projects</h3>
+                    <h3>You can see other people's works and study their projects and blogs.</h3>
+                </div>
+            </div>
+            <div class="card text-end mb-2">
+                <img class="card-img" src="img4.jpg" alt="img4" style="height: 300px" />
+                <div class="card-img-overlay" style="padding: 35px; justify-content: flex-start">
+                    <h3 class="display-5 fw-bold">Use this profile in your resume</h3>
+                    <h3>You can use your platform profile in your job resume so that your employer can see your project catalog and blogs.</h3>
+                </div>
+            </div>
+            <div class="card bg-dark text-white mb-2">
+                <div class="empty">
+                    <div class="empty-title">
+                        Ready to share and learn from this INFINITE space?
+                    </div>
+                    <div class="empty-subtitle">
+                        You are just a click away from signing up to the platform. Use your Google or GitHub account to signup now!
+                    </div>
+                    <div class="empty-action">
+                        <a href="authentication/login" class="btn btn-light">
+                            Sign up! It's FREE
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-@code {
-
-    private void OpenToast()
-    {
-        Toast.Add("Title", "This is a toast", Severity.Normal);
-    }
-
-}
