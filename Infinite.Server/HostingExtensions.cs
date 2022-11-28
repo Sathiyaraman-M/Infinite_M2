@@ -78,6 +78,7 @@ public static class HostingExtensions
         app.UseIdentityServer();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.ConfigureFileAccessMiddleware();
 
         app.MapRazorPages();
         app.MapControllers();
@@ -117,5 +118,23 @@ public static class HostingExtensions
         services.AddTransient<IUserLikesService, UserLikesService>();
         services.AddTransient<IUserFollowService, UserFollowService>();
         services.AddTransient<ISubscriptionService, SubscriptionService>();
+    }
+
+    private static void ConfigureFileAccessMiddleware(this IApplicationBuilder app)
+    {
+        app.UseStaticFiles(new StaticFileOptions()
+        {
+            RequestPath = new PathString("/Files"),
+            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Files")),
+            OnPrepareResponse = context =>
+            {
+                if (context.Context.User.IsAuthenticated()) 
+                    return;
+                context.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                context.Context.Response.ContentLength = 0;
+                context.Context.Response.Body = Stream.Null;
+                context.Context.Response.SetNoCache();
+            }
+        });
     }
 }
