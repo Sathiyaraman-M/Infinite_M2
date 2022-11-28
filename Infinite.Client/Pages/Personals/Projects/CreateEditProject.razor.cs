@@ -11,7 +11,7 @@ namespace Infinite.Client.Pages.Personals.Projects;
 
 public partial class CreateEditProject
 {
-    private static string _pageTitle = "Add a project";
+    private static string _pageTitle = "Share new project";
     private string _userId;
     private string _userName;
 
@@ -23,7 +23,7 @@ public partial class CreateEditProject
 
     private void OnChangeFiles(InputFileChangeEventArgs args)
     {
-        _browserFiles = args.FileCount == 1 ? new IBrowserFile[] { args.File } : args.GetMultipleFiles();
+        _browserFiles = args.FileCount == 1 ? new [] { args.File } : args.GetMultipleFiles();
     }
 
     private async Task AddSelectedFiles()
@@ -35,7 +35,7 @@ public partial class CreateEditProject
                 var extension = Path.GetExtension(file.Name);
                 var fileName = $"{file.Name}";
                 var data = new byte[file.Size];
-                var result = await file.OpenReadStream().ReadAsync(data);
+                var result = await file.OpenReadStream(200 * 1024 * 1024).ReadAsync(data);
                 Toast.Add("Info", "File Added Successfully", Severity.Info);
                 Model.Uploads.Add(new UploadRequest()
                 {
@@ -53,40 +53,40 @@ public partial class CreateEditProject
             Toast.Add("Empty", "No Files Added");
         }
     }
-    
-    public string GetBytesReadable(long i)
+
+    private static string GetBytesReadable(long i)
     {
         // Get absolute value
-        long absolute_i = (i < 0 ? -i : i);
+        var absoluteI = (i < 0 ? -i : i);
         // Determine the suffix and readable value
         string suffix;
         double readable;
-        if (absolute_i >= 0x1000000000000000) // Exabyte
+        if (absoluteI >= 0x1000000000000000) // Exabyte
         {
             suffix = "EB";
             readable = (i >> 50);
         }
-        else if (absolute_i >= 0x4000000000000) // Petabyte
+        else if (absoluteI >= 0x4000000000000) // Petabyte
         {
             suffix = "PB";
             readable = (i >> 40);
         }
-        else if (absolute_i >= 0x10000000000) // Terabyte
+        else if (absoluteI >= 0x10000000000) // Terabyte
         {
             suffix = "TB";
             readable = (i >> 30);
         }
-        else if (absolute_i >= 0x40000000) // Gigabyte
+        else if (absoluteI >= 0x40000000) // Gigabyte
         {
             suffix = "GB";
             readable = (i >> 20);
         }
-        else if (absolute_i >= 0x100000) // Megabyte
+        else if (absoluteI >= 0x100000) // Megabyte
         {
             suffix = "MB";
             readable = (i >> 10);
         }
-        else if (absolute_i >= 0x400) // Kilobyte
+        else if (absoluteI >= 0x400) // Kilobyte
         {
             suffix = "KB";
             readable = i;
@@ -110,7 +110,7 @@ public partial class CreateEditProject
         {   
             _pageTitle = "Edit the project";
             var result = await ProjectHttpClient.GetFullProject(Id.ToString());
-            if (result!.Succeeded)
+            if (result?.Succeeded ?? false)
             {
                 var response = result.Data;
                 Model = new EditProjectRequest()
@@ -135,7 +135,7 @@ public partial class CreateEditProject
             }
             else
             {
-                foreach (var message in result.Messages)
+                foreach (var message in result?.Messages ?? new List<string>()) 
                 {
                     Toast.Add("Error", message, Severity.Error);
                 }

@@ -9,7 +9,7 @@
     }
     else
     {
-        @("Add project | Novel Infinite")
+        @("Share project | Novel Infinite")
     }
 </PageTitle>
 <EditForm Model="Model" OnValidSubmit="SubmitAsync">
@@ -24,7 +24,7 @@
                         }
                         else
                         {
-                            <h2 class="page-title">Add project</h2>
+                            <h2 class="page-title">Share project</h2>
                         }
                     </div>
                     <div class="col-auto">
@@ -106,13 +106,53 @@
                             </div>
                             <div class="col-12 mb-2">
                                 <label class="form-label">Elaborate Objectives</label>
-                                <InputTextArea @bind-Value="@Model.ElaborateObjectives" class="form-control"></InputTextArea>
-                                <div class="form-text">Markdown supported</div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
+                                            <li class="nav-item">
+                                                <a href="#eo-markdown-tab" class="nav-link active" data-bs-toggle="tab">Markdown</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="#eo-preview-tab" class="nav-link" data-bs-toggle="tab">Preview</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content">
+                                            <div class="tab-pane active show" id="eo-markdown-tab">
+                                                <InputTextArea @bind-Value="@Model.ElaborateObjectives" class="form-control w-100"></InputTextArea>
+                                            </div>
+                                            <div class="tab-pane" id="eo-preview-tab">
+                                                @(new MarkupString(Markdown.ToHtml(Model.ElaborateObjectives ?? "")))
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-12 mb-2">
                                 <label class="form-label">Requirements</label>
-                                <InputTextArea @bind-Value="@Model.Requirements" class="form-control"></InputTextArea>
-                                <div class="form-text">Markdown supported</div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
+                                            <li class="nav-item">
+                                                <a href="#re-markdown-tab" class="nav-link active" data-bs-toggle="tab">Markdown</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="#re-preview-tab" class="nav-link" data-bs-toggle="tab">Preview</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content">
+                                            <div class="tab-pane active show" id="re-markdown-tab">
+                                                <InputTextArea @bind-Value="@Model.Requirements" class="form-control w-100"></InputTextArea>
+                                            </div>
+                                            <div class="tab-pane" id="re-preview-tab">
+                                                @(new MarkupString(Markdown.ToHtml(Model.Requirements ?? "")))
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row row-deck">
@@ -192,7 +232,7 @@
                             <label for="formFile" class="form-label"></label>
                             <div class="row">
                                 <div class="col">
-                                    <InputFile multiple id="formFile" class="form-control" OnChange="@OnChangeFiles" />
+                                    <InputFile multiple id="formFile" accept="image/*" class="form-control" OnChange="@OnChangeFiles" />
                                 </div>
                                 <div class="col-auto">
                                     <button type="button" class="btn btn-primary" @onclick="AddSelectedFiles">Add selected files</button>
@@ -210,10 +250,13 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                @{
+                                    var i = 1;
+                                }
                                 @foreach (var upload in Model.Uploads)
                                 {
                                     <tr>
-                                        <td>1</td>
+                                        <td>@i</td>
                                         <td>@upload.FileName</td>
                                         <td>@GetBytesReadable(upload.Data.LongLength)</td>
                                         <td>
@@ -223,6 +266,7 @@
                                             </button>
                                         </td>
                                     </tr>
+                                    i++;
                                 }
                                 </tbody>
                             </table>

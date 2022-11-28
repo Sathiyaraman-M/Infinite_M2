@@ -6,6 +6,14 @@
         <a href="Personal/Settings" class="text-white ms-2">
             Hello, @(context.User.FindFirstValue(JwtClaimTypes.PreferredUserName))!
         </a>
+        <button class="btn btn-primary ms-3" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/New"))">
+            <BSIcon Icon="@TablerIcons.Plus" />
+            Share Project
+        </button>
+        <button class="btn btn-secondary ms-3" @onclick="@(() => NavigationManager.NavigateTo("Personal/Blogs/New"))">
+            <BSIcon Icon="@TablerIcons.Pencil" />
+            Write Blog
+        </button>
         <button class="btn btn-light ms-3" @onclick="@(() => NavigationManager.NavigateToLogout("authentication/logout"))">Log Out</button>
     </Authorized>
     <NotAuthorized>

@@ -61,7 +61,7 @@
                     <div class="d-flex align-center">
                         <button class="btn btn-cyan rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects/New"))">
                             <BSIcon Icon="@TablerIcons.Plus" />
-                            Add Project
+                            Share Project
                         </button>
                         <button class="btn rounded-2 me-2" @onclick="@(() => NavigationManager.NavigateTo("Personal/Projects"))">
                             <BSIcon Icon="@TablerIcons.List_details" Color="Color.Dark" />
@@ -87,7 +87,7 @@
                                     <div class="d-flex justify-center">
                                         <button class="btn btn-cyan mt-1" @onclick="@(() => NavigationManager.NavigateTo("/Personal/Projects/New"))">
                                             <BSIcon Icon="@TablerIcons.Plus" />
-                                            Add one
+                                            Share one
                                         </button>
                                     </div>
                                 </div>
@@ -163,7 +163,7 @@
                                         <h3>@context.Name</h3>
                                     </a>
                                     <h5 class="text-reset">@context.FullName</h5>
-                                    <span class="badge bg-blue">@context.Country</span>
+                                    <span class="badge bg-blue">@(string.IsNullOrWhiteSpace(context.Country) ? "International" : context.Country)</span>
                                     <p class="text-muted">@context.Status</p>
                                 </div>
                             </div>
