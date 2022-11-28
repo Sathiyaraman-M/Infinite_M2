@@ -1,4 +1,6 @@
-﻿using Hangfire;
+﻿using System.Net;
+using Duende.IdentityServer.Extensions;
+using Hangfire;
 using Hangfire.Storage.SQLite;
 using Infinite.Base.Entities;
 using Infinite.Core.Features;
@@ -8,18 +10,22 @@ using Infinite.Core.Interfaces.Services;
 using Infinite.Core.Persistence;
 using Infinite.Core.Repositories;
 using Infinite.Core.Services;
+using Infinite.Server.Authorization;
 using Infinite.Server.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace Infinite.Server;
 
 public static class HostingExtensions
 {
+    internal const string NotFileAccess = "NotFileAccess";
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+        //builder.Services.ConfigureFileAccessServices();
         builder.Services.AddIdentity<AppUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<AppDbContext>();
         builder.Services.AddIdentityServer()
@@ -87,6 +93,12 @@ public static class HostingExtensions
         });
         
         return app;
+    }
+
+    private static void ConfigureFileAccessServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IAuthorizationPolicyProvider, FileAuthorizationPolicyProvider>();
+        services.AddSingleton<IAuthorizationHandler, FileAuthorizationHandler>();
     }
 
     private static void ConfigureInternalServices(this IServiceCollection services)
