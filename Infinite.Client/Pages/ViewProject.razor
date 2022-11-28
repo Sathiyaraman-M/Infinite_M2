@@ -40,13 +40,13 @@
                                     </button>
                                     @if (IsBookmarked)
                                     {
-                                        <button class="btn btn-icon btn-yellow" @onclick="@(() => ToggleBookmark(false))">
+                                        <button class="btn btn-icon btn-yellow" @onclick="@ToggleBookmark">
                                             <BSIcon Icon="@TablerIcons.Bookmark" Class="icon-filled" />
                                         </button>
                                     }
                                     else
                                     {
-                                        <button class="btn btn-icon" @onclick="@(() => ToggleBookmark(true))">
+                                        <button class="btn btn-icon" @onclick="@ToggleBookmark">
                                             <BSIcon Icon="@TablerIcons.Bookmark" Color="Color.Dark" />
                                         </button>
                                     }
@@ -243,6 +243,7 @@ else
     private LikeResponse LikeResponse { get; set; }
     private List<MinifiedProjectResponse> RecentFromAuthor { get; set; }
     private bool IsAuthenticated { get; set; }
+    private List<string> Files { get; set; } = new();
     
     private List<ProjectBlogResponse> ProjectBlogs { get; set; }
 
@@ -276,6 +277,9 @@ else
                     var projectBlogsResponse = await ProjectHttpClient.GetProjectBlogs(Id.ToString());
                     if (projectBlogsResponse!.Succeeded)
                         ProjectBlogs = projectBlogsResponse.Data;
+                    var filesResponse = await HttpClient.GetFromJsonAsync<Result<List<string>>>($"api/files/project/{Id}");
+                    if (filesResponse!.Succeeded)
+                        Files = filesResponse.Data;
                 }
             }
             else
@@ -290,7 +294,7 @@ else
         await base.OnParametersSetAsync();
     }
 
-    private async Task ToggleBookmark(bool toggled)
+    private async Task ToggleBookmark()
     {
         var toggleBookmarkResult = await UserBookmarkHttpClient.ToggleProjectBookmark(Id);
         if (toggleBookmarkResult.Succeeded)
