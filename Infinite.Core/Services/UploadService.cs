@@ -4,7 +4,7 @@ namespace Infinite.Core.Services;
 
 public class UploadService : IUploadService
 {
-    public string UploadAsync(UploadRequest request, string id)
+    public string Upload(UploadRequest request, string id)
     {
         if (request.Data == null) return string.Empty;
         var streamData = new MemoryStream(request.Data);

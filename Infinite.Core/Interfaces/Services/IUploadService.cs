@@ -2,5 +2,5 @@
 
 public interface IUploadService
 {
-    string UploadAsync(UploadRequest model, string id);
+    string Upload(UploadRequest model, string id);
 }
