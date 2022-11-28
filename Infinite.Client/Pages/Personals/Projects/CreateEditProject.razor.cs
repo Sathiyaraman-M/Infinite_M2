@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Net.Http.Json;
+using System.Security.Claims;
 using BlazorSlice.Dialog;
 using BlazorSlice.Dialog.Services;
 using Infinite.Base.Enums;
@@ -132,6 +133,17 @@ public partial class CreateEditProject
                     CapitalSourceType = response.CapitalSourceType,
                     Complexity = response.Complexity,
                 };
+                var filesResult =
+                    await HttpClient.GetFromJsonAsync<Result<List<UploadRequest>>>($"api/files/project/{Id}/files");
+                if (filesResult?.Succeeded ?? false)
+                {
+                    Model.Uploads = filesResult.Data;
+                    StateHasChanged();
+                }
+                foreach (var message in filesResult?.Messages ?? new List<string>() { "File Uploads Failed" }) 
+                {
+                    Toast.Add("File Error", message, Severity.Error);
+                }
             }
             else
             {

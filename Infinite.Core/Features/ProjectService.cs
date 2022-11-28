@@ -1,14 +1,17 @@
-﻿using Infinite.Core.Specifications;
+﻿using Infinite.Core.Interfaces.Services;
+using Infinite.Core.Specifications;
 
 namespace Infinite.Core.Features;
 
 public class ProjectService : IProjectService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IUploadService _uploadService;
 
-    public ProjectService(IUnitOfWork unitOfWork)
+    public ProjectService(IUnitOfWork unitOfWork, IUploadService uploadService)
     {
         _unitOfWork = unitOfWork;
+        _uploadService = uploadService;
     }
     
     public async Task<IResult<List<ProjectAuthorResponse>>> SearchAuthors(string searchString)
@@ -250,6 +253,12 @@ public class ProjectService : IProjectService
 
                 //Add the project object
                 await _unitOfWork.GetRepository<Project>().AddAsync(project);
+                
+                //Upload Files
+                foreach (var uploadRequest in request.Uploads)
+                {
+                    _uploadService.Upload(uploadRequest, id.ToString());
+                }
 
                 //Save changes in database
                 await _unitOfWork.Commit();
@@ -299,6 +308,18 @@ public class ProjectService : IProjectService
                     ProjectId = id.ToString(),
                     UserId = author.Id
                 });
+            }
+            
+            //Remove Existing Files
+            foreach (var file in Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "Files", id.ToString())))
+            {
+                File.Delete(file);
+            }
+
+            //Add New files
+            foreach (var uploadRequest in request.Uploads)
+            {
+                _uploadService.Upload(uploadRequest, id.ToString());
             }
 
             //Update the existing project
