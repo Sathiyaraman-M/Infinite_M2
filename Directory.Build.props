@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <ProjectTargetFramework>net7.0</ProjectTargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Label="Container Publish Props">
+    <BaseImage>mcr.microsoft.com/dotnet/aspnet:7.0-jammy-chiseled</BaseImage>
+  </PropertyGroup>
+</Project>
