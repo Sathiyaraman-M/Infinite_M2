@@ -26,4 +26,14 @@ public class AppDbContext : ApiAuthorizationDbContext<AppUser>
     public DbSet<BlogLike> UserBlogLikes { get; set; }
     public DbSet<ProjectLike> UserProjectLikes { get; set; }
     public DbSet<UserFollow> UserFollows { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        foreach (var property in builder.Model.GetEntityTypes().SelectMany(t => t.GetProperties())
+        .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
+        {
+            property.SetColumnType("decimal(18,2)");
+        }
+        base.OnModelCreating(builder);
+    }
 }

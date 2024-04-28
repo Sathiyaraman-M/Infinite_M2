@@ -24,7 +24,7 @@ public static class HostingExtensions
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
         //builder.Services.ConfigureFileAccessServices();
         builder.Services.AddIdentity<AppUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<AppDbContext>();
@@ -44,7 +44,7 @@ public static class HostingExtensions
         builder.Services.AddAuthorization();
         builder.Services.ConfigureInternalServices();
         builder.Services.ConfigureFeatures();
-        builder.Services.AddHangfire(x => x.UseSQLiteStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
         builder.Services.AddHangfireServer();
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
