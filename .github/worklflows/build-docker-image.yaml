@@ -1,0 +1,42 @@
+name: Build & Push Docker Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.100
+
+      - name: Docker Login
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin ghcr.io
+
+      - name: Restore
+        run: dotnet restore src/Infinite.Server/Infinite.Server.csproj
+
+      - name: Build
+        run: dotnet build src/Infinite.Server/Infinite.Server.csproj --configuration Release --no-restore
+
+      - name: Publish to Local Docker daemon
+        run: dotnet publish src/Infinite.Server/Infinite.Server.csproj --configuration Release --no-build --no-restore /t:PublishContainer
+
+      - name: Setup Image Repository name
+        run: echo "IMAGE_REPOSITORY=sathiyaraman-m/infinite-m2" >> $GITHUB_ENV
+
+      - name: Tag Docker image
+        run: |
+          docker tag infinite-m2 ghcr.io/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}
+          docker tag infinite-m2 ghcr.io/${{ env.IMAGE_REPOSITORY }}:latest
+
+      - name: Push to GitHub Container Registry
+        run: |
+          docker push ghcr.io/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}
+          docker push ghcr.io/${{ env.IMAGE_REPOSITORY }}:latest
