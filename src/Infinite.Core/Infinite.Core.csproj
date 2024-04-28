@@ -1,26 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>$(ProjectTargetFramework)</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>$(ProjectTargetFramework)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Infinite.Base\Infinite.Base.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infinite.Base\Infinite.Base.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="FluentEmail.Smtp" Version="3.0.2" />
-        <PackageReference Include="Hangfire.Core" Version="1.7.32" />
-        <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="7.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentEmail.Smtp" />
+    <PackageReference Include="Hangfire.Core" />
+    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>
