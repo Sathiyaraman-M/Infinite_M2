@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFramework>$(ProjectTargetFramework)</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <WebPublishMethod>Container</WebPublishMethod>
+    <ContainerBaseImage>$(BaseImage)</ContainerBaseImage>
+    <ContainerRepository>infinite-m2</ContainerRepository>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +30,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ContainerPort Include="8080" Type="tcp" />
   </ItemGroup>
 
 </Project>
