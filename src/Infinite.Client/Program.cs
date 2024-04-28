@@ -5,7 +5,7 @@ global using BlazorSlice.Toast;
 global using Microsoft.AspNetCore.Components;
 using Infinite.Client.Extensions;
 
-WebAssemblyHostBuilder.CreateDefault(args)
+await WebAssemblyHostBuilder.CreateDefault(args)
     .AddRootComponents()
     .ConfigureServices()
     .Build()
