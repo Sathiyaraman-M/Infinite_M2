@@ -21,7 +21,6 @@ h1:focus {
 .linear-progress {
      background: silver;
      width: 50vw;
-     margin: 20% auto;
      height: 1rem;
      border-radius: 10rem;
      overflow: hidden;
