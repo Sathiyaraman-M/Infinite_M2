@@ -118,6 +118,9 @@ public static class HostingExtensions
 
     private static void ConfigureFileAccessMiddleware(this IApplicationBuilder app)
     {
+        if(!Directory.Exists("/Files")) {
+            Directory.CreateDirectory("/Files");
+        }
         app.UseStaticFiles(new StaticFileOptions()
         {
             RequestPath = new PathString("/Files"),
