@@ -1,19 +1,12 @@
 ﻿namespace Infinite.Core.Features;
 
-public class UserBookmarkService : IUserBookmarkService
+public class UserBookmarkService(IUnitOfWork unitOfWork) : IUserBookmarkService
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UserBookmarkService(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<IResult<bool>> IsBlogBookmarked(string blogId, string userId)
     {
         try
         {
-            var bookmark = await _unitOfWork.GetRepository<BlogBookmark>().Entities
+            var bookmark = await unitOfWork.GetRepository<BlogBookmark>().Entities
                 .FirstOrDefaultAsync(x => x.BlogId == blogId && x.UserId == userId);
             return await Result<bool>.SuccessAsync(bookmark != null);
         }
@@ -27,7 +20,7 @@ public class UserBookmarkService : IUserBookmarkService
     {
         try
         {
-            var bookmark = await _unitOfWork.GetRepository<BlogBookmark>().Entities
+            var bookmark = await unitOfWork.GetRepository<BlogBookmark>().Entities
                 .FirstOrDefaultAsync(x => x.BlogId == blogId && x.UserId == userId);
             if (bookmark == null)
             {
@@ -37,13 +30,13 @@ public class UserBookmarkService : IUserBookmarkService
                     BlogId = blogId,
                     UserId = userId
                 };
-                await _unitOfWork.GetRepository<BlogBookmark>().AddAsync(newBookmark);
+                await unitOfWork.GetRepository<BlogBookmark>().AddAsync(newBookmark);
             }
             else
             {
-                await _unitOfWork.GetRepository<BlogBookmark>().DeleteAsync(bookmark);
+                await unitOfWork.GetRepository<BlogBookmark>().DeleteAsync(bookmark);
             }
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result<bool>.SuccessAsync(bookmark == null);
         }
         catch (Exception e)
@@ -56,7 +49,7 @@ public class UserBookmarkService : IUserBookmarkService
     {
         try
         {
-            return await _unitOfWork.GetRepository<BlogBookmark>()
+            return await unitOfWork.GetRepository<BlogBookmark>()
                 .Entities
                 .Include(x => x.Blog)
                 .Where(x => x.UserId == userId)
@@ -80,7 +73,7 @@ public class UserBookmarkService : IUserBookmarkService
     {
         try
         {
-            var bookmark = await _unitOfWork.GetRepository<ProjectBookmark>().Entities
+            var bookmark = await unitOfWork.GetRepository<ProjectBookmark>().Entities
                 .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.UserId == userId);
             return await Result<bool>.SuccessAsync(bookmark != null);
         }
@@ -94,7 +87,7 @@ public class UserBookmarkService : IUserBookmarkService
     {
         try
         {
-            var bookmark = await _unitOfWork.GetRepository<ProjectBookmark>().Entities
+            var bookmark = await unitOfWork.GetRepository<ProjectBookmark>().Entities
                 .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.UserId == userId);
             if (bookmark == null)
             {
@@ -104,13 +97,13 @@ public class UserBookmarkService : IUserBookmarkService
                     ProjectId = projectId,
                     UserId = userId
                 };
-                await _unitOfWork.GetRepository<ProjectBookmark>().AddAsync(newBookmark);
+                await unitOfWork.GetRepository<ProjectBookmark>().AddAsync(newBookmark);
             }
             else
             {
-                await _unitOfWork.GetRepository<ProjectBookmark>().DeleteAsync(bookmark);
+                await unitOfWork.GetRepository<ProjectBookmark>().DeleteAsync(bookmark);
             }
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result<bool>.SuccessAsync(bookmark == null);
         }
         catch (Exception e)
@@ -123,7 +116,7 @@ public class UserBookmarkService : IUserBookmarkService
     {
         try
         {
-            return await _unitOfWork.GetRepository<ProjectBookmark>()
+            return await unitOfWork.GetRepository<ProjectBookmark>()
                 .Entities
                 .Include(x => x.Project)
                 .Where(x => x.UserId == userId)

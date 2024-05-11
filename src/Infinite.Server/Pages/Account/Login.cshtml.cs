@@ -5,17 +5,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Infinite.Server.Pages.Account;
 
-public class LoginModel : PageModel
+public class LoginModel(SignInManager<AppUser> signInManager) : PageModel
 {
-    private readonly SignInManager<AppUser> _signInManager;
-    private readonly ILogger<LoginModel> _logger;
-
-    public LoginModel(SignInManager<AppUser> signInManager, ILogger<LoginModel> logger)
-    {
-        _signInManager = signInManager;
-        _logger = logger;
-    }
-
     public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
     public string ReturnUrl { get; set; }
@@ -28,7 +19,7 @@ public class LoginModel : PageModel
         // Clear the existing external cookie to ensure a clean login process
         await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
         ReturnUrl = returnUrl;
     }

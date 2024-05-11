@@ -4,14 +4,8 @@ using Microsoft.Extensions.Options;
 
 namespace Infinite.Core.Persistence;
 
-public class AppDbContext : ApiAuthorizationDbContext<AppUser>
+public class AppDbContext(DbContextOptions<AppDbContext> dbContextOptions, IOptions<OperationalStoreOptions> operationalStoreOptions) : ApiAuthorizationDbContext<AppUser>(dbContextOptions, operationalStoreOptions)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> dbContextOptions, IOptions<OperationalStoreOptions> operationalStoreOptions) 
-        : base(dbContextOptions, operationalStoreOptions)
-    {
-        
-    }
-    
     public DbSet<UserProfileInfo> UserProfileInfos { get; set; }
     public DbSet<UserPortfolio> UserPortfolios { get; set; }
     public DbSet<UserSubscription> UserSubscriptions { get; set; }

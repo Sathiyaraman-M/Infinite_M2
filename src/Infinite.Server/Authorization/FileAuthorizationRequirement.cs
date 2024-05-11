@@ -1,11 +1,6 @@
 ﻿namespace Infinite.Server.Authorization;
 
-public class FileAuthorizationRequirement : IAuthorizationRequirement
+public class FileAuthorizationRequirement(string folderDirectory) : IAuthorizationRequirement
 {
-    public string FolderDirectory { get; }
-
-    public FileAuthorizationRequirement(string folderDirectory)
-    {
-        FolderDirectory = folderDirectory;
-    }
+    public string FolderDirectory { get; } = folderDirectory;
 }

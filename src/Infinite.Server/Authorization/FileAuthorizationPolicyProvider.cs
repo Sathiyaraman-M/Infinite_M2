@@ -2,14 +2,9 @@
 
 namespace Infinite.Server.Authorization;
 
-public class FileAuthorizationPolicyProvider : IAuthorizationPolicyProvider
+public class FileAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : IAuthorizationPolicyProvider
 {
-    private DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
-    
-    public FileAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
-    {
-        FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
-    }
+    private DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; } = new DefaultAuthorizationPolicyProvider(options);
 
     public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
     {

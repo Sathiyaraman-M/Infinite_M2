@@ -2,21 +2,12 @@
 
 namespace Infinite.Core.Specifications.Base;
 
-public class AndSpecification<T> : BaseSpecification<T> where T: class, IEntity
+public class AndSpecification<T>(ISpecification<T> left, ISpecification<T> right) : BaseSpecification<T> where T: class, IEntity
 {
-    private readonly ISpecification<T> _left;
-    private readonly ISpecification<T> _right;
-
-    public AndSpecification(ISpecification<T> left, ISpecification<T> right)
-    {
-        _left = left;
-        _right = right;
-    }
-
     public Expression<Func<T, bool>> GetFilterExpression()
     {
-        var leftExpression = _left.FilterCondition;
-        var rightExpression = _right.FilterCondition;
+        var leftExpression = left.FilterCondition;
+        var rightExpression = right.FilterCondition;
 
         var paramExpr = Expression.Parameter(typeof(T));
         var exprBody = Expression.AndAlso(leftExpression.Body, rightExpression.Body);
@@ -28,21 +19,12 @@ public class AndSpecification<T> : BaseSpecification<T> where T: class, IEntity
     public override Expression<Func<T, bool>> FilterCondition => GetFilterExpression();
 }
 
-public class OrSpecification<T> : BaseSpecification<T> where T: class, IEntity
+public class OrSpecification<T>(ISpecification<T> left, ISpecification<T> right) : BaseSpecification<T> where T: class, IEntity
 {
-    private readonly ISpecification<T> _left;
-    private readonly ISpecification<T> _right;
-
-    public OrSpecification(ISpecification<T> left, ISpecification<T> right)
-    {
-        _left = left;
-        _right = right;
-    }
-
     public Expression<Func<T, bool>> GetFilterExpression()
     {
-        var leftExpression = _left.FilterCondition;
-        var rightExpression = _right.FilterCondition;
+        var leftExpression = left.FilterCondition;
+        var rightExpression = right.FilterCondition;
 
         var paramExpr = Expression.Parameter(typeof(T));
         var exprBody = Expression.OrElse(leftExpression.Body, rightExpression.Body);

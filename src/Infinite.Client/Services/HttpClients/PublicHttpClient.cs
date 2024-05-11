@@ -1,11 +1,6 @@
 ﻿namespace Infinite.Client.Services.HttpClients;
 
-public class PublicHttpClient
+public class PublicHttpClient(HttpClient httpClient)
 {
-    public HttpClient HttpClient { get; }
-
-    public PublicHttpClient(HttpClient httpClient)
-    {
-        HttpClient = httpClient;
-    }
+    public HttpClient HttpClient { get; } = httpClient;
 }

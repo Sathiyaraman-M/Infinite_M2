@@ -3,22 +3,13 @@ using Infinite.Core.Specifications;
 
 namespace Infinite.Core.Features;
 
-public class ProjectService : IProjectService
+public class ProjectService(IUnitOfWork unitOfWork, IUploadService uploadService) : IProjectService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IUploadService _uploadService;
-
-    public ProjectService(IUnitOfWork unitOfWork, IUploadService uploadService)
-    {
-        _unitOfWork = unitOfWork;
-        _uploadService = uploadService;
-    }
-    
     public async Task<IResult<List<ProjectAuthorResponse>>> SearchAuthors(string searchString)
     {
         try
         {
-            var authors = await _unitOfWork.GetRepository<AppUser>().Entities
+            var authors = await unitOfWork.GetRepository<AppUser>().Entities
                 .Specify(new AuthorSearchFilterSpecification(searchString))
                 .Select(x => new ProjectAuthorResponse(x.Id, x.UserName))
                 .Take(5)
@@ -35,7 +26,7 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var blogs = await _unitOfWork.GetRepository<Blog>().Entities
+            var blogs = await unitOfWork.GetRepository<Blog>().Entities
                 .Where(x => x.Visibility != Visibility.Private && request.AuthorIds.Contains(x.UserId))
                 .Specify(new BlogSearchFilterSpecification(request.SearchString))
                 .Take(5)
@@ -59,7 +50,7 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var project = await _unitOfWork.GetRepository<Project>().Entities
+            var project = await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
                 .ThenInclude(x => x.User)
                 .Where(x => x.Id == id)
@@ -100,7 +91,7 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var authors = await _unitOfWork.GetRepository<Project>().Entities
+            var authors = await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
                 .ThenInclude(x => x.User)
                 .Where(x => (x.Visibility == Visibility.Private && x.UserProjects.Any(y => y.UserId == userId))
@@ -120,7 +111,7 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var authors = await _unitOfWork.GetRepository<Project>().Entities
+            var authors = await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
                 .ThenInclude(x => x.User)
                 .Include(x => x.Blogs)
@@ -143,7 +134,7 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var projects = await _unitOfWork.GetRepository<Project>().Entities
+            var projects = await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
                 .Where(x => x.UserProjects.Any(y => y.UserId == authorId))
                 .WhereIf(!string.IsNullOrEmpty(exclude), x => x.Id != exclude)
@@ -174,7 +165,7 @@ public class ProjectService : IProjectService
     {
         try
         {
-            return await _unitOfWork.GetRepository<Project>().Entities
+            return await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
                 .Where(x => x.UserProjects.Any(y => y.UserId == authorId))
                 .WhereIf(authorId != userId, x => x.Visibility == Visibility.Public)
@@ -243,7 +234,7 @@ public class ProjectService : IProjectService
                 //Add the authors to the project object 
                 foreach (var author in request.Authors)
                 {
-                    await _unitOfWork.GetRepository<UserProject>().AddAsync(new UserProject
+                    await unitOfWork.GetRepository<UserProject>().AddAsync(new UserProject
                     {
                         Id = Guid.NewGuid().ToString(),
                         ProjectId = id.ToString(),
@@ -252,16 +243,16 @@ public class ProjectService : IProjectService
                 }
 
                 //Add the project object
-                await _unitOfWork.GetRepository<Project>().AddAsync(project);
+                await unitOfWork.GetRepository<Project>().AddAsync(project);
                 
                 //Upload Files
                 foreach (var uploadRequest in request.Uploads)
                 {
-                    _uploadService.Upload(uploadRequest, id.ToString());
+                    uploadService.Upload(uploadRequest, id.ToString());
                 }
 
                 //Save changes in database
-                await _unitOfWork.Commit();
+                await unitOfWork.Commit();
                 return await Result<string>.SuccessAsync(id.ToString(), "Added successfully");
             }
 
@@ -270,7 +261,7 @@ public class ProjectService : IProjectService
                 throw new Exception("Invalid Request");
 
             //Get the existing project object
-            var existingProject = await _unitOfWork.GetRepository<Project>().Entities
+            var existingProject = await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
                 .FirstAsync(x => x.Id == id.ToString());
 
@@ -295,14 +286,14 @@ public class ProjectService : IProjectService
             //Remove all author objects
             foreach (var author in existingProject.UserProjects)
             {
-                await _unitOfWork.GetRepository<UserProject>().DeleteAsync(author);
+                await unitOfWork.GetRepository<UserProject>().DeleteAsync(author);
             }
 
             //Add all the updated author objects
             foreach (var author in request.Authors)
             {
                 //existingProject.UserProjects.Add(userProject);
-                await _unitOfWork.GetRepository<UserProject>().AddAsync(new UserProject
+                await unitOfWork.GetRepository<UserProject>().AddAsync(new UserProject
                 {
                     Id = Guid.NewGuid().ToString(),
                     ProjectId = id.ToString(),
@@ -319,14 +310,14 @@ public class ProjectService : IProjectService
             //Add New files
             foreach (var uploadRequest in request.Uploads)
             {
-                _uploadService.Upload(uploadRequest, id.ToString());
+                uploadService.Upload(uploadRequest, id.ToString());
             }
 
             //Update the existing project
-            await _unitOfWork.GetRepository<Project>().UpdateAsync(existingProject, id.ToString());
+            await unitOfWork.GetRepository<Project>().UpdateAsync(existingProject, id.ToString());
 
             //Save changes in database
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result<string>.SuccessAsync(id.ToString(), "Project updated successfully");
         }
         catch (Exception e)
@@ -339,17 +330,15 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var project = await _unitOfWork.GetRepository<Project>().Entities
+            var project = await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
                 .Include(x => x.Blogs)
-                .FirstOrDefaultAsync(x => x.Id == request.Id);
-            if (project == null)
-                throw new Exception("Project not found!");
+                .FirstOrDefaultAsync(x => x.Id == request.Id) ?? throw new Exception("Project not found!");
             if (project.UserProjects.All(x => x.UserId != userId))
                 throw new Exception("You cannot edit a project that you aren't part of!");
             foreach (var projectBlog in project.Blogs)
             {
-                await _unitOfWork.GetRepository<ProjectBlog>().DeleteAsync(projectBlog);
+                await unitOfWork.GetRepository<ProjectBlog>().DeleteAsync(projectBlog);
             }
             foreach (var blog in request.Blogs)
             {
@@ -360,9 +349,9 @@ public class ProjectService : IProjectService
                     ProjectId = request.Id,
                     Index = request.Blogs.IndexOf(blog)
                 };
-                await _unitOfWork.GetRepository<ProjectBlog>().AddAsync(projectBlog);
+                await unitOfWork.GetRepository<ProjectBlog>().AddAsync(projectBlog);
             }
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result.SuccessAsync("Updated Project Blogs successfully");
         }
         catch (Exception e)
@@ -375,22 +364,19 @@ public class ProjectService : IProjectService
     {
         try
         {
-            var project = await _unitOfWork.GetRepository<Project>().Entities
+            var project = await unitOfWork.GetRepository<Project>().Entities
                 .Include(x => x.UserProjects)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (project == null)
-                throw new Exception("Project not found!");
+                .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Project not found!");
             if (project.UserProjects.All(x => x.UserId != userId))
                 throw new Exception("You cannot delete a project that you didn't contribute");
 
             foreach (var userProject in project.UserProjects)
             {
-                await _unitOfWork.GetRepository<UserProject>().DeleteAsync(userProject);
+                await unitOfWork.GetRepository<UserProject>().DeleteAsync(userProject);
             }
 
-            await _unitOfWork.GetRepository<Project>().DeleteAsync(project);
-            await _unitOfWork.Commit(); 
+            await unitOfWork.GetRepository<Project>().DeleteAsync(project);
+            await unitOfWork.Commit(); 
             return await Result.SuccessAsync("Deleted Successfully");
         }
         catch (Exception e)

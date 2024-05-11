@@ -3,54 +3,47 @@ using Infinite.Base.Responses;
 
 namespace Infinite.Client.Services.HttpClients;
 
-public class UserFollowHttpClient
+public class UserFollowHttpClient(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient;
-
-    public UserFollowHttpClient(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
     public async Task<PaginatedResult<AuthorPublicInfoResponse>> GetFollowerDetails(int pageNumber, int pageSize,
         string searchString, string authorId = null)
     {
-        return await _httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
+        return await httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
             $"api/user/follow/followers?pageNumber={pageNumber}&pageSize={pageSize}&searchString={searchString}&authorId={authorId}");
     }
 
     public async Task<PaginatedResult<AuthorPublicInfoResponse>> GetAllFollowerDetails(string authorId = null)
     {
-        return await _httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
+        return await httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
             $"api/user/follow/followers/all?authorId={authorId}");
     }
 
     public async Task<PaginatedResult<AuthorPublicInfoResponse>> GetFollowedDetails(int pageNumber, int pageSize,
         string searchString, string authorId = null)
     {
-        return await _httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
+        return await httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
             $"api/user/follow/followed?pageNumber={pageNumber}&pageSize={pageSize}&searchString={searchString}&authorId={authorId}");
     }
 
     public async Task<PaginatedResult<AuthorPublicInfoResponse>> GetAllFollowedDetails(string authorId = null)
     {
-        return await _httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
+        return await httpClient.GetFromJsonAsync<PaginatedResult<AuthorPublicInfoResponse>>(
             $"api/user/follow/followed/all?authorId={authorId}");
     }
 
     public async Task<IResult<bool>> IsUserFollowed(string authorId)
     {
-        return await _httpClient.GetFromJsonAsync<Result<bool>>($"api/user/follow?authorId={authorId}");
+        return await httpClient.GetFromJsonAsync<Result<bool>>($"api/user/follow?authorId={authorId}");
     }
 
     public async Task<IResult<bool>> ToggleUserFollow(string followedId)
     {
-        return await _httpClient.GetFromJsonAsync<Result<bool>>($"api/user/follow/toggle?followedId={followedId}");
+        return await httpClient.GetFromJsonAsync<Result<bool>>($"api/user/follow/toggle?followedId={followedId}");
     }
 
     public async Task<IResult<FollowStatResponse>> GetFollowStat(string authorId = null)
     {
-        return await _httpClient.GetFromJsonAsync<Result<FollowStatResponse>>(
+        return await httpClient.GetFromJsonAsync<Result<FollowStatResponse>>(
             $"api/user/follow/stat?authorId={authorId}");
     }
 }

@@ -1,19 +1,12 @@
 ﻿namespace Infinite.Core.Features;
 
-public class UserFollowService : IUserFollowService
+public class UserFollowService(IUnitOfWork unitOfWork) : IUserFollowService
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UserFollowService(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<PaginatedResult<AuthorPublicInfoResponse>> GetFollowedPeopleDetails(int pageNumber, int pageSize, string searchString, string userId)
     {
         try
         {
-            return await _unitOfWork.GetRepository<UserFollow>().Entities
+            return await unitOfWork.GetRepository<UserFollow>().Entities
                 .Include(x => x.Followed)
                 .Include(x => x.FollowedProfileInfo)
                 .Where(x => x.FollowerId == userId)
@@ -37,7 +30,7 @@ public class UserFollowService : IUserFollowService
     {
         try
         {
-            var followed = await _unitOfWork.GetRepository<UserFollow>().Entities
+            var followed = await unitOfWork.GetRepository<UserFollow>().Entities
                 .Include(x => x.Followed)
                 .Include(x => x.FollowedProfileInfo)
                 .Where(x => x.FollowerId == userId)
@@ -62,7 +55,7 @@ public class UserFollowService : IUserFollowService
     {
         try
         {
-            return await _unitOfWork.GetRepository<UserFollow>().Entities
+            return await unitOfWork.GetRepository<UserFollow>().Entities
                 .Include(x => x.Follower)
                 .Include(x => x.FollowerProfileInfo)
                 .Where(x => x.FollowedId == userId)
@@ -87,7 +80,7 @@ public class UserFollowService : IUserFollowService
     {
         try
         {
-            var followed = await _unitOfWork.GetRepository<UserFollow>().Entities
+            var followed = await unitOfWork.GetRepository<UserFollow>().Entities
                 .Include(x => x.Follower)
                 .Include(x => x.FollowerProfileInfo)
                 .Where(x => x.FollowedId == userId)
@@ -113,7 +106,7 @@ public class UserFollowService : IUserFollowService
     {
         try
         {
-            var userFollow = await _unitOfWork.GetRepository<UserFollow>().Entities
+            var userFollow = await unitOfWork.GetRepository<UserFollow>().Entities
                 .FirstOrDefaultAsync(x => x.FollowedId == authorId && x.FollowerId == userId);
             return await Result<bool>.SuccessAsync(userFollow != null);
         }
@@ -129,14 +122,14 @@ public class UserFollowService : IUserFollowService
         {
             if (userId == followedId)
                 throw new Exception("One cannot follow himself/herself");
-            var userFollow = await _unitOfWork.GetRepository<UserFollow>().Entities
+            var userFollow = await unitOfWork.GetRepository<UserFollow>().Entities
                 .Where(x => x.FollowedId == followedId && x.FollowerId == userId)
                 .FirstOrDefaultAsync();
             if (userFollow == null)
             {
-                var followerProfile = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+                var followerProfile = await unitOfWork.GetRepository<UserProfileInfo>().Entities
                     .FirstAsync(x => x.UserId == userId);
-                var followedProfile = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+                var followedProfile = await unitOfWork.GetRepository<UserProfileInfo>().Entities
                     .FirstAsync(x => x.UserId == followedId);
                 var newUserFollow = new UserFollow()
                 {
@@ -146,13 +139,13 @@ public class UserFollowService : IUserFollowService
                     FollowerId = userId,
                     FollowerProfileInfoId = followerProfile.Id,
                 };
-                await _unitOfWork.GetRepository<UserFollow>().AddAsync(newUserFollow);
+                await unitOfWork.GetRepository<UserFollow>().AddAsync(newUserFollow);
             }
             else
             {
-                await _unitOfWork.GetRepository<UserFollow>().DeleteAsync(userFollow);
+                await unitOfWork.GetRepository<UserFollow>().DeleteAsync(userFollow);
             }
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result<bool>.SuccessAsync(userFollow == null);
         }
         catch (Exception e)
@@ -165,12 +158,12 @@ public class UserFollowService : IUserFollowService
     {
         try
         {
-            var userProfileInfo = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+            var userProfileInfo = await unitOfWork.GetRepository<UserProfileInfo>().Entities
                 .Include(x => x.User)
                 .FirstAsync(x => x.UserId == userId);
-            var followed = await _unitOfWork.GetRepository<UserFollow>().Entities
+            var followed = await unitOfWork.GetRepository<UserFollow>().Entities
                 .CountAsync(x => x.FollowerId == userId);
-            var followers = await _unitOfWork.GetRepository<UserFollow>().Entities
+            var followers = await unitOfWork.GetRepository<UserFollow>().Entities
                 .CountAsync(x => x.FollowedId == userId);
             var response = new FollowStatResponse(userId, userProfileInfo.User.UserName, userProfileInfo.FullName,
                 followers, followed);

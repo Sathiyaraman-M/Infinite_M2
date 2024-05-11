@@ -5,45 +5,38 @@ using Infinite.Client.Extensions;
 
 namespace Infinite.Client.Services.HttpClients;
 
-public class ManageAccountHttpClient
+public class ManageAccountHttpClient(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient;
-
-    public ManageAccountHttpClient(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
     public async Task<IResult<AuthorPublicInfoResponse>> GetAuthorPublicDetails(string id)
     {
-        return await _httpClient.GetFromJsonAsync<Result<AuthorPublicInfoResponse>>($"api/manage/details?id={id}");
+        return await httpClient.GetFromJsonAsync<Result<AuthorPublicInfoResponse>>($"api/manage/details?id={id}");
     }
 
     public async Task<IResult<string>> GetUserPortfolio(string id = null)
     {
-        return await _httpClient.GetFromJsonAsync<Result<string>>($"api/manage/portfolio?id={id}");
+        return await httpClient.GetFromJsonAsync<Result<string>>($"api/manage/portfolio?id={id}");
     }
 
     public async Task<IResult> SaveUserPortfolio(string markdown)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/manage/portfolio", new { Markdown = markdown });
+        var response = await httpClient.PostAsJsonAsync("api/manage/portfolio", new { Markdown = markdown });
         return await response.ToResult();
     }
 
     public async Task<IResult<UserProfileInfoResponse>> GetUserProfileInfo()
     {
-        return await _httpClient.GetFromJsonAsync<Result<UserProfileInfoResponse>>("api/manage/profileInfo");
+        return await httpClient.GetFromJsonAsync<Result<UserProfileInfoResponse>>("api/manage/profileInfo");
     }
 
     public async Task<IResult> SaveUserProfileInfo(UpdateUserProfileInfoRequest request)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/manage/profileInfo", request);
+        var response = await httpClient.PostAsJsonAsync("api/manage/profileInfo", request);
         return await response.ToResult();
     }
 
     public async Task<IResult> DeleteAccountPermanently()
     {
-        var response = await _httpClient.DeleteAsync("api/manage/account");
+        var response = await httpClient.DeleteAsync("api/manage/account");
         return await response.ToResult();
     }
 }

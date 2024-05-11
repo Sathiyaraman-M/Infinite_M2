@@ -2,24 +2,15 @@
 
 namespace Infinite.Core.Features;
 
-public class ManageAccountService : IManageAccountService
+public class ManageAccountService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager) : IManageAccountService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly UserManager<AppUser> _userManager;
-
-    public ManageAccountService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager)
-    {
-        _unitOfWork = unitOfWork;
-        _userManager = userManager;
-    }
-
     public async Task<IResult<string>> GetPortFolioMd(string userId)
     {
         try
         {
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("User not found!");
-            var portFolioMd = await _unitOfWork.GetRepository<UserPortfolio>().Entities
+            var portFolioMd = await unitOfWork.GetRepository<UserPortfolio>().Entities
                 .FirstOrDefaultAsync(x => x.UserId == userId);
             if (portFolioMd != null) 
                 return await Result<string>.SuccessAsync(data: portFolioMd.PortfolioMarkdown);
@@ -29,8 +20,8 @@ public class ManageAccountService : IManageAccountService
                 PortfolioMarkdown = string.Empty,
                 UserId = userId
             };
-            await _unitOfWork.GetRepository<UserPortfolio>().AddAsync(portFolioMd);
-            await _unitOfWork.Commit();
+            await unitOfWork.GetRepository<UserPortfolio>().AddAsync(portFolioMd);
+            await unitOfWork.Commit();
             return await Result<string>.SuccessAsync(data: portFolioMd.PortfolioMarkdown);
         }
         catch (Exception e)
@@ -45,11 +36,11 @@ public class ManageAccountService : IManageAccountService
         {
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("User not found!");
-            var portFolioMd = await _unitOfWork.GetRepository<UserPortfolio>().Entities
+            var portFolioMd = await unitOfWork.GetRepository<UserPortfolio>().Entities
                 .FirstAsync(x => x.UserId == userId);
             portFolioMd.PortfolioMarkdown = markdown;
-            await _unitOfWork.GetRepository<UserPortfolio>().UpdateAsync(portFolioMd, portFolioMd.Id);
-            await _unitOfWork.Commit();
+            await unitOfWork.GetRepository<UserPortfolio>().UpdateAsync(portFolioMd, portFolioMd.Id);
+            await unitOfWork.Commit();
             return await Result.SuccessAsync();
         }
         catch (Exception e)
@@ -64,10 +55,8 @@ public class ManageAccountService : IManageAccountService
         {
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("User not found!");
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                throw new Exception("Something went wrong");
-            var userProfileInfo = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+            var user = await userManager.FindByIdAsync(userId) ?? throw new Exception("Something went wrong");
+            var userProfileInfo = await unitOfWork.GetRepository<UserProfileInfo>().Entities
                 .FirstOrDefaultAsync(x => x.UserId == user.Id);
             if (userProfileInfo == null)
             {
@@ -77,8 +66,8 @@ public class ManageAccountService : IManageAccountService
                     DateOfBirth = DateTime.MinValue,
                     UserId = user.Id
                 };
-                await _unitOfWork.GetRepository<UserProfileInfo>().AddAsync(userProfileInfo);
-                await _unitOfWork.Commit();
+                await unitOfWork.GetRepository<UserProfileInfo>().AddAsync(userProfileInfo);
+                await unitOfWork.Commit();
             }
             var response = new UserProfileInfoResponse()
             {
@@ -106,7 +95,7 @@ public class ManageAccountService : IManageAccountService
         {
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("User not found!");
-            var userCurrSubscription = await _unitOfWork.GetRepository<UserCurrentSubscription>()
+            var userCurrSubscription = await unitOfWork.GetRepository<UserCurrentSubscription>()
                 .Entities
                 .FirstOrDefaultAsync(x => x.UserId == userId);
             if (userCurrSubscription == null)
@@ -120,8 +109,8 @@ public class ManageAccountService : IManageAccountService
                     SubscriptionPlan = SubscriptionPlan.Free,
                     UserId = userId
                 };
-                await _unitOfWork.GetRepository<UserCurrentSubscription>().AddAsync(userCurrSubscription);
-                await _unitOfWork.Commit();
+                await unitOfWork.GetRepository<UserCurrentSubscription>().AddAsync(userCurrSubscription);
+                await unitOfWork.Commit();
             }
             var response = new UserSubscriptionResponse
             {
@@ -144,10 +133,8 @@ public class ManageAccountService : IManageAccountService
         {
             if (string.IsNullOrEmpty(authorId))
                 throw new Exception("Author not found!");
-            var user = await _userManager.FindByIdAsync(authorId);
-            if (user == null)
-                throw new Exception("Something went wrong");
-            var userProfileInfo = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+            var user = await userManager.FindByIdAsync(authorId) ?? throw new Exception("Something went wrong");
+            var userProfileInfo = await unitOfWork.GetRepository<UserProfileInfo>().Entities
                 .FirstOrDefaultAsync(x => x.UserId == user.Id);
             if (userProfileInfo == null)
             {
@@ -157,8 +144,8 @@ public class ManageAccountService : IManageAccountService
                     DateOfBirth = DateTime.MinValue,
                     UserId = user.Id
                 };
-                await _unitOfWork.GetRepository<UserProfileInfo>().AddAsync(userProfileInfo);
-                await _unitOfWork.Commit();
+                await unitOfWork.GetRepository<UserProfileInfo>().AddAsync(userProfileInfo);
+                await unitOfWork.Commit();
             }
             var response = new AuthorPublicInfoResponse()
             {
@@ -183,12 +170,10 @@ public class ManageAccountService : IManageAccountService
         {
             if (string.IsNullOrEmpty(request.Email))
                 throw new Exception("Email is empty!");
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
-                throw new Exception("Something went wrong");
+            var user = await userManager.FindByEmailAsync(request.Email) ?? throw new Exception("Something went wrong");
             user.UserName = request.Name;
             user.PhoneNumber = request.Mobile;
-            var userProfileInfo = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+            var userProfileInfo = await unitOfWork.GetRepository<UserProfileInfo>().Entities
                 .FirstOrDefaultAsync(x => x.UserId == user.Id);
             if (userProfileInfo == null)
             {
@@ -203,7 +188,7 @@ public class ManageAccountService : IManageAccountService
                     Status = request.Status,
                     UserId = user.Id
                 };
-                await _unitOfWork.GetRepository<UserProfileInfo>().AddAsync(userProfileInfo);
+                await unitOfWork.GetRepository<UserProfileInfo>().AddAsync(userProfileInfo);
             }
             else
             {
@@ -213,9 +198,9 @@ public class ManageAccountService : IManageAccountService
                 userProfileInfo.DateOfBirth = request.DateOfBirth.GetValueOrDefault();
                 userProfileInfo.FullName = request.FullName;
                 userProfileInfo.Status = request.Status;
-                await _unitOfWork.GetRepository<UserProfileInfo>().UpdateAsync(userProfileInfo, userProfileInfo.Id);
+                await unitOfWork.GetRepository<UserProfileInfo>().UpdateAsync(userProfileInfo, userProfileInfo.Id);
             }
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result.SuccessAsync();
         }
         catch (Exception e)
@@ -231,26 +216,26 @@ public class ManageAccountService : IManageAccountService
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("User not found!");
             //UserProfileInfo
-            var profileInfo = await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+            var profileInfo = await unitOfWork.GetRepository<UserProfileInfo>().Entities
                 .FirstOrDefaultAsync(x => x.UserId == userId);
             if(profileInfo != null)
-                await _unitOfWork.GetRepository<UserProfileInfo>().DeleteAsync(profileInfo);
+                await unitOfWork.GetRepository<UserProfileInfo>().DeleteAsync(profileInfo);
             
             //UserPortfolio
-            var portFolioMd = await _unitOfWork.GetRepository<UserPortfolio>().Entities
+            var portFolioMd = await unitOfWork.GetRepository<UserPortfolio>().Entities
                 .FirstOrDefaultAsync(x => x.UserId == userId);
             if(portFolioMd != null)
-                await _unitOfWork.GetRepository<UserPortfolio>().DeleteAsync(portFolioMd);
+                await unitOfWork.GetRepository<UserPortfolio>().DeleteAsync(portFolioMd);
 
             //IdentityUserLogin
-            var userLogin = await _unitOfWork.AppDbContext.UserLogins
+            var userLogin = await unitOfWork.AppDbContext.UserLogins
                 .FirstAsync(x => x.UserId == userId);
-            _unitOfWork.AppDbContext.UserLogins.Remove(userLogin);
+            unitOfWork.AppDbContext.UserLogins.Remove(userLogin);
             
             //AppUser
-            var user = await _userManager.FindByIdAsync(userId);
-            await _userManager.DeleteAsync(user!);
-            await _unitOfWork.Commit();
+            var user = await userManager.FindByIdAsync(userId);
+            await userManager.DeleteAsync(user!);
+            await unitOfWork.Commit();
 
             return await Result.SuccessAsync();
         }

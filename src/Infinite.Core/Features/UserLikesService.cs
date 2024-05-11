@@ -1,21 +1,14 @@
 ﻿namespace Infinite.Core.Features;
 
-public class UserLikesService : IUserLikesService
+public class UserLikesService(IUnitOfWork unitOfWork) : IUserLikesService
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UserLikesService(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-    
     public async Task<IResult<LikeResponse>> IsBlogLiked(string blogId, string userId)
     {
         try
         {
-            var like = await _unitOfWork.GetRepository<BlogLike>().Entities
+            var like = await unitOfWork.GetRepository<BlogLike>().Entities
                 .FirstOrDefaultAsync(x => x.BlogId == blogId && x.UserId == userId);
-            var count = await _unitOfWork.GetRepository<BlogLike>().CountAsync(x => x.BlogId == blogId);
+            var count = await unitOfWork.GetRepository<BlogLike>().CountAsync(x => x.BlogId == blogId);
             return await Result<LikeResponse>.SuccessAsync(new LikeResponse(count, like != null));
         }
         catch (Exception e)
@@ -28,7 +21,7 @@ public class UserLikesService : IUserLikesService
     {
         try
         {
-            var like = await _unitOfWork.GetRepository<BlogLike>().Entities
+            var like = await unitOfWork.GetRepository<BlogLike>().Entities
                 .FirstOrDefaultAsync(x => x.BlogId == blogId && x.UserId == userId);
             if (like == null)
             {
@@ -38,14 +31,14 @@ public class UserLikesService : IUserLikesService
                     BlogId = blogId,
                     UserId = userId
                 };
-                await _unitOfWork.GetRepository<BlogLike>().AddAsync(newBlogLike);
+                await unitOfWork.GetRepository<BlogLike>().AddAsync(newBlogLike);
             }
             else
             {
-                await _unitOfWork.GetRepository<BlogLike>().DeleteAsync(like);
+                await unitOfWork.GetRepository<BlogLike>().DeleteAsync(like);
             }
-            await _unitOfWork.Commit();
-            var count = await _unitOfWork.GetRepository<BlogLike>().CountAsync(x => x.BlogId == blogId);
+            await unitOfWork.Commit();
+            var count = await unitOfWork.GetRepository<BlogLike>().CountAsync(x => x.BlogId == blogId);
             return await Result<LikeResponse>.SuccessAsync(new LikeResponse(count, like == null));
         }
         catch (Exception e)
@@ -58,7 +51,7 @@ public class UserLikesService : IUserLikesService
     {
         try
         {
-            return await _unitOfWork.GetRepository<BlogLike>()
+            return await unitOfWork.GetRepository<BlogLike>()
                 .Entities
                 .Include(x => x.Blog)
                 .Where(x => x.UserId == userId)
@@ -82,9 +75,9 @@ public class UserLikesService : IUserLikesService
     {
         try
         {
-            var like = await _unitOfWork.GetRepository<ProjectLike>().Entities
+            var like = await unitOfWork.GetRepository<ProjectLike>().Entities
                 .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.UserId == userId);
-            var count = await _unitOfWork.GetRepository<ProjectLike>().CountAsync(x => x.ProjectId == projectId);
+            var count = await unitOfWork.GetRepository<ProjectLike>().CountAsync(x => x.ProjectId == projectId);
             return await Result<LikeResponse>.SuccessAsync(new LikeResponse(count, like != null));
         }
         catch (Exception e)
@@ -97,7 +90,7 @@ public class UserLikesService : IUserLikesService
     {
         try
         {
-            var like = await _unitOfWork.GetRepository<ProjectLike>().Entities
+            var like = await unitOfWork.GetRepository<ProjectLike>().Entities
                 .FirstOrDefaultAsync(x => x.ProjectId == projectId && x.UserId == userId);
             if (like == null)
             {
@@ -107,14 +100,14 @@ public class UserLikesService : IUserLikesService
                     UserId = userId,
                     ProjectId = projectId
                 };
-                await _unitOfWork.GetRepository<ProjectLike>().AddAsync(newBlogLike);
+                await unitOfWork.GetRepository<ProjectLike>().AddAsync(newBlogLike);
             }
             else
             {
-                await _unitOfWork.GetRepository<ProjectLike>().DeleteAsync(like);
+                await unitOfWork.GetRepository<ProjectLike>().DeleteAsync(like);
             }
-            await _unitOfWork.Commit();
-            var count = await _unitOfWork.GetRepository<ProjectLike>().CountAsync(x => x.ProjectId == projectId);
+            await unitOfWork.Commit();
+            var count = await unitOfWork.GetRepository<ProjectLike>().CountAsync(x => x.ProjectId == projectId);
             return await Result<LikeResponse>.SuccessAsync(new LikeResponse(count, like == null));
         }
         catch (Exception e)
@@ -127,7 +120,7 @@ public class UserLikesService : IUserLikesService
     {
         try
         {
-            return await _unitOfWork.GetRepository<ProjectLike>()
+            return await unitOfWork.GetRepository<ProjectLike>()
                 .Entities
                 .Include(x => x.Project)
                 .Where(x => x.UserId == userId)

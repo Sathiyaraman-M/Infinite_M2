@@ -5,15 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infinite.Server.Authorization;
 
-public class FileAuthorizationHandler : AuthorizationHandler<FileAuthorizationRequirement>
+public class FileAuthorizationHandler(IUnitOfWork unitOfWork) : AuthorizationHandler<FileAuthorizationRequirement>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public FileAuthorizationHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-    
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, FileAuthorizationRequirement requirement)
     {
         try
@@ -33,14 +26,14 @@ public class FileAuthorizationHandler : AuthorizationHandler<FileAuthorizationRe
                 context.Succeed(requirement);
                 return;
             }
-            var userIdFound = await _unitOfWork.GetRepository<AppUser>().Entities.AnyAsync(x => x.Id == path);
+            var userIdFound = await unitOfWork.GetRepository<AppUser>().Entities.AnyAsync(x => x.Id == path);
             if (userIdFound)
             {
                 context.Succeed(requirement);
             }
             else
             {
-                var projectIdFound = await _unitOfWork.GetRepository<UserProject>().Entities
+                var projectIdFound = await unitOfWork.GetRepository<UserProject>().Entities
                     .AnyAsync(x => x.UserId == userId && x.ProjectId == path);
                 if (projectIdFound)
                 {

@@ -2,20 +2,13 @@
 
 namespace Infinite.Core.Features;
 
-public class SubscriptionService : ISubscriptionService
+public class SubscriptionService(IUnitOfWork unitOfWork) : ISubscriptionService
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public SubscriptionService(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<IResult<UserSubscriptionResponse>> GetCurrentSubscription(string userId)
     {
         try
         {
-            var subscription = await _unitOfWork.GetRepository<UserCurrentSubscription>().Entities
+            var subscription = await unitOfWork.GetRepository<UserCurrentSubscription>().Entities
                 .FirstAsync(x => x.UserId == userId);
             var response = new UserSubscriptionResponse()
             {
@@ -36,11 +29,11 @@ public class SubscriptionService : ISubscriptionService
     {
         try
         {
-            var currSub = await _unitOfWork.GetRepository<UserCurrentSubscription>().Entities
+            var currSub = await unitOfWork.GetRepository<UserCurrentSubscription>().Entities
                 .FirstOrDefaultAsync(x => x.UserId == userId);
             if (currSub != null)
             {
-                await _unitOfWork.GetRepository<UserCurrentSubscription>().DeleteAsync(currSub);
+                await unitOfWork.GetRepository<UserCurrentSubscription>().DeleteAsync(currSub);
             }
             var newSub = new UserCurrentSubscription
             {
@@ -60,8 +53,8 @@ public class SubscriptionService : ISubscriptionService
                 },
                 UserId = userId
             };
-            await _unitOfWork.GetRepository<UserCurrentSubscription>().AddAsync(newSub);
-            await _unitOfWork.Commit();
+            await unitOfWork.GetRepository<UserCurrentSubscription>().AddAsync(newSub);
+            await unitOfWork.Commit();
             if (newSub.SubscriptionPlan != SubscriptionPlan.Free)
             {
                 BackgroundJob.Schedule(() => RevertSubscription(userId), newSub.ExpiresOn);
@@ -76,12 +69,12 @@ public class SubscriptionService : ISubscriptionService
 
     private async Task RevertSubscription(string userId)
     {
-        var currSub = await _unitOfWork.GetRepository<UserCurrentSubscription>().Entities
+        var currSub = await unitOfWork.GetRepository<UserCurrentSubscription>().Entities
             .FirstAsync(x => x.UserId == userId);
         currSub.ExpiresOn = DateTime.MaxValue;
         currSub.SubscriptionBasis = SubscriptionBasis.None;
         currSub.SubscriptionPlan = SubscriptionPlan.Free;
-        await _unitOfWork.GetRepository<UserCurrentSubscription>().UpdateAsync(currSub, currSub.Id);
-        await _unitOfWork.Commit();
+        await unitOfWork.GetRepository<UserCurrentSubscription>().UpdateAsync(currSub, currSub.Id);
+        await unitOfWork.Commit();
     }
 }

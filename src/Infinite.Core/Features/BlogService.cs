@@ -2,24 +2,15 @@
 
 namespace Infinite.Core.Features;
 
-public class BlogService : IBlogService
+public class BlogService(IUnitOfWork unitOfWork) : IBlogService
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public BlogService(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<IResult<FullBlogResponse>> GetFullBlog(string id, string userId)
     {
         try
         {
             //Get Blog from database
-            var blog = await _unitOfWork.GetRepository<Blog>().GetByIdAsync(id);
-            if (blog == null)
-                throw new Exception("Blog not found");
-            
+            var blog = await unitOfWork.GetRepository<Blog>().GetByIdAsync(id) ?? throw new Exception("Blog not found");
+
             //Create response object
             var blogResponse = new FullBlogResponse
             {
@@ -51,9 +42,7 @@ public class BlogService : IBlogService
         try
         {
             //Get BlogDraft from database
-            var draft = await _unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(id);
-            if (draft == null)
-                throw new Exception("Draft not found");
+            var draft = await unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(id) ?? throw new Exception("Draft not found");
             if (draft.UserId != userId)
                 throw new Exception("Draft not found");
             
@@ -82,7 +71,7 @@ public class BlogService : IBlogService
     {
         try
         {
-            var blogs = await _unitOfWork.GetRepository<Blog>().Entities
+            var blogs = await unitOfWork.GetRepository<Blog>().Entities
                 .Where(x => x.UserId == authorId)
                 .WhereIf(!string.IsNullOrEmpty(exclude), x => x.Id != exclude)
                 .WhereIf(authorId != userId, x => x.Visibility == Visibility.Public)
@@ -108,7 +97,7 @@ public class BlogService : IBlogService
     {
         try
         {
-            var blogs = await _unitOfWork.GetRepository<BlogDraft>().Entities
+            var blogs = await unitOfWork.GetRepository<BlogDraft>().Entities
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.SaveDateTime)
                 .Take(n)
@@ -133,7 +122,7 @@ public class BlogService : IBlogService
     {
         try
         {
-            return await _unitOfWork.GetRepository<Blog>().Entities
+            return await unitOfWork.GetRepository<Blog>().Entities
                 .Where(x => x.UserId == authorId)
                 .WhereIf(authorId != userId, x => x.Visibility == Visibility.Public)
                 .Specify(new BlogSearchFilterSpecification(searchString))
@@ -157,7 +146,7 @@ public class BlogService : IBlogService
     {
         try
         {
-            return await _unitOfWork.GetRepository<BlogDraft>().Entities
+            return await unitOfWork.GetRepository<BlogDraft>().Entities
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.SaveDateTime)
                 .Select(x => new MinifiedBlogDraftResponse()
@@ -191,7 +180,7 @@ public class BlogService : IBlogService
             if (isGuid && id == Guid.Empty)
             {
                 //Retrieve AuthorName from User Profile Info
-                var authorName = (await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+                var authorName = (await unitOfWork.GetRepository<UserProfileInfo>().Entities
                     .FirstAsync(x => x.UserId == userId)).FullName;
                 
                 //Create a blog object
@@ -208,15 +197,15 @@ public class BlogService : IBlogService
                 };
                 
                 //Add the new blog
-                await _unitOfWork.GetRepository<Blog>().AddAsync(blog);
+                await unitOfWork.GetRepository<Blog>().AddAsync(blog);
                 
                 //Delete the draft after publish if present
-                var draftForNew = await _unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(request.DraftId);
+                var draftForNew = await unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(request.DraftId);
                 if (draftForNew != null)
-                    await _unitOfWork.GetRepository<BlogDraft>().DeleteAsync(draftForNew);
+                    await unitOfWork.GetRepository<BlogDraft>().DeleteAsync(draftForNew);
                 
                 //Save changes to database
-                await _unitOfWork.Commit();
+                await unitOfWork.Commit();
                 return await Result.SuccessAsync("Added Blog Successfully");
             }
             //Throw exception if invalid Id found
@@ -224,7 +213,7 @@ public class BlogService : IBlogService
                 throw new Exception("Invalid Request");
             
             //Get the existingBlog
-            var existingBlog = await _unitOfWork.GetRepository<Blog>().GetByIdAsync(request.BlogId);
+            var existingBlog = await unitOfWork.GetRepository<Blog>().GetByIdAsync(request.BlogId);
             existingBlog.Title = request.Title;
             existingBlog.Markdown = request.Markdown;
             existingBlog.AuthorName = request.AuthorName;
@@ -232,15 +221,15 @@ public class BlogService : IBlogService
             existingBlog.LastEditedDate = DateTime.Now;
             
             //Update the blog
-            await _unitOfWork.GetRepository<Blog>().UpdateAsync(existingBlog, request.BlogId);
+            await unitOfWork.GetRepository<Blog>().UpdateAsync(existingBlog, request.BlogId);
 
             //Delete the draft after publish if present
-            var draft = await _unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(request.DraftId);
+            var draft = await unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(request.DraftId);
             if (draft != null)
-                await _unitOfWork.GetRepository<BlogDraft>().DeleteAsync(draft);
+                await unitOfWork.GetRepository<BlogDraft>().DeleteAsync(draft);
             
             //Save changes to database
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result.SuccessAsync("Updated Blog Successfully");
         }
         catch (Exception e)
@@ -271,14 +260,14 @@ public class BlogService : IBlogService
                 //Update DraftId if BlogDraft already exists
                 if (blogId != Guid.Empty)
                 {
-                    var unexpectedExistingDraft = await _unitOfWork.GetRepository<BlogDraft>().Entities
+                    var unexpectedExistingDraft = await unitOfWork.GetRepository<BlogDraft>().Entities
                         .FirstOrDefaultAsync(x => x.BlogId == request.BlogId);
                     if (unexpectedExistingDraft != null)
                         id = Guid.Parse(unexpectedExistingDraft.Id);
                 }
 
                 //Retrieve AuthorName from User Profile Info
-                var authorName = (await _unitOfWork.GetRepository<UserProfileInfo>().Entities
+                var authorName = (await unitOfWork.GetRepository<UserProfileInfo>().Entities
                     .FirstAsync(x => x.UserId == userId)).FullName;
                 
                 //Create a BlogDraft object
@@ -297,17 +286,17 @@ public class BlogService : IBlogService
                     //Add the new BlogDraft
                     id = Guid.NewGuid();
                     draft.Id = id.ToString();
-                    await _unitOfWork.GetRepository<BlogDraft>().AddAsync(draft);
+                    await unitOfWork.GetRepository<BlogDraft>().AddAsync(draft);
                 }
                 else
                 {
                     //Update the existing BlogDraft
                     draft.Id = id.ToString();
-                    await _unitOfWork.GetRepository<BlogDraft>().UpdateAsync(draft, draft.Id);
+                    await unitOfWork.GetRepository<BlogDraft>().UpdateAsync(draft, draft.Id);
                 }
 
                 //Save changes in database
-                await _unitOfWork.Commit();
+                await unitOfWork.Commit();
                 return await Result.SuccessAsync("Saved to drafts successfully");
             }
             //Throw exception if invalid Id found
@@ -315,7 +304,7 @@ public class BlogService : IBlogService
                 throw new Exception("Invalid Request");
             
             //Get the existing draft object
-            var existingDraft = await _unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(request.DraftId);
+            var existingDraft = await unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(request.DraftId);
             existingDraft.Title = request.Title;
             existingDraft.AuthorName = request.AuthorName;
             existingDraft.MarkdownContent = request.Markdown;
@@ -324,10 +313,10 @@ public class BlogService : IBlogService
             existingDraft.UserId = request.UserId;
             
             //Update the existing draft
-            await _unitOfWork.GetRepository<BlogDraft>().UpdateAsync(existingDraft, request.DraftId);
+            await unitOfWork.GetRepository<BlogDraft>().UpdateAsync(existingDraft, request.DraftId);
 
             //Save changes in database
-            await _unitOfWork.Commit();
+            await unitOfWork.Commit();
             return await Result.SuccessAsync("Updated the draft successfully");
         }
         catch (Exception e)
@@ -340,13 +329,11 @@ public class BlogService : IBlogService
     {
         try
         {
-            var blog = await _unitOfWork.GetRepository<Blog>().GetByIdAsync(id);
-            if (blog == null)
-                throw new Exception("Blog not found");
+            var blog = await unitOfWork.GetRepository<Blog>().GetByIdAsync(id) ?? throw new Exception("Blog not found");
             if (blog.UserId != userId)
                 throw new Exception("Cannot delete some other's blog");
-            await _unitOfWork.GetRepository<Blog>().DeleteAsync(blog);
-            await _unitOfWork.Commit();
+            await unitOfWork.GetRepository<Blog>().DeleteAsync(blog);
+            await unitOfWork.Commit();
             return await Result.SuccessAsync("Deleted successfully");
         }
         catch (Exception e)
@@ -359,13 +346,11 @@ public class BlogService : IBlogService
     {
         try
         {
-            var draft = await _unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(id);
-            if (draft == null)
-                throw new Exception("Draft not found");
+            var draft = await unitOfWork.GetRepository<BlogDraft>().GetByIdAsync(id) ?? throw new Exception("Draft not found");
             if (draft.UserId != userId)
                 throw new Exception("Cannot delete some other's draft");
-            await _unitOfWork.GetRepository<BlogDraft>().DeleteAsync(draft);
-            await _unitOfWork.Commit();
+            await unitOfWork.GetRepository<BlogDraft>().DeleteAsync(draft);
+            await unitOfWork.Commit();
             return await Result.SuccessAsync("Deleted successfully");
         }
         catch (Exception e)

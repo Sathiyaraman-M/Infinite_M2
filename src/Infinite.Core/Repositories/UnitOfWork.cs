@@ -3,16 +3,11 @@ using Infinite.Core.Persistence;
 
 namespace Infinite.Core.Repositories;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork(AppDbContext appDbContext) : IUnitOfWork
 {
-    public AppDbContext AppDbContext { get; }
+    public AppDbContext AppDbContext { get; } = appDbContext;
     private bool _disposed;
     private Hashtable _repositories;
-
-    public UnitOfWork(AppDbContext appDbContext)
-    {
-        AppDbContext = appDbContext;
-    }
 
     public IRepositoryAsync<T> GetRepository<T>() where T : class, IEntity
     {
