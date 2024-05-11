@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Duende.IdentityServer.Extensions;
 using Hangfire;
-using Hangfire.Storage.SQLite;
 using Infinite.Base.Entities;
 using Infinite.Core.Features;
 using Infinite.Core.Interfaces.Features;

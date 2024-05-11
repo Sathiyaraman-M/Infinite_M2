@@ -21,7 +21,6 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" />
     <PackageReference Include="Hangfire" />
-    <PackageReference Include="Hangfire.Storage.SQLite" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
