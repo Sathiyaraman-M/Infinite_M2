@@ -7,6 +7,7 @@
     <WebPublishMethod>Container</WebPublishMethod>
     <ContainerBaseImage>$(BaseImage)</ContainerBaseImage>
     <ContainerRepository>infinite-m2</ContainerRepository>
+    <ContainerUser>root</ContainerUser>
   </PropertyGroup>
 
   <ItemGroup>
